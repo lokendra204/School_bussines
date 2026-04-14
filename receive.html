@@ -12,6 +12,18 @@
             padding:30px 15px;
         }
 
+        .back-btn{
+            position:absolute;
+            top:15px;
+            left:15px;
+            background:black;
+            color:white;
+            padding:8px 12px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:14px;
+        }
+
         h1{
             text-align:center;
             color:#333;
@@ -21,7 +33,7 @@
 
         .container{
             max-width:900px;
-            margin:auto;
+            margin:60px auto 0;
         }
 
         .note-card{
@@ -71,11 +83,17 @@
 
 <body>
 
+<div class="back-btn" onclick="goBack()">⬅ Back</div>
+
 <h1>📥 VIEW NOTES</h1>
 
 <div class="container" id="container"></div>
 
 <script>
+function goBack(){
+    window.location.href = "dashboard.html";
+}
+
 function loadNotes(){
     let container = document.getElementById("container");
     container.innerHTML = "";
