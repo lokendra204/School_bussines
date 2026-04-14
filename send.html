@@ -15,6 +15,18 @@
             height:100vh;
         }
 
+        .back-btn{
+            position:absolute;
+            top:15px;
+            left:15px;
+            background:black;
+            color:white;
+            padding:8px 12px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:14px;
+        }
+
         .box{
             width:350px;
             background:white;
@@ -26,7 +38,6 @@
 
         h2{
             margin-bottom:15px;
-            color:#333;
         }
 
         input{
@@ -35,12 +46,6 @@
             margin:10px 0;
             border-radius:8px;
             border:1px solid #ccc;
-            outline:none;
-            font-size:14px;
-        }
-
-        input:focus{
-            border-color:#667eea;
         }
 
         .upload{
@@ -58,10 +63,6 @@
             transition:0.3s;
         }
 
-        .upload:hover{
-            transform:scale(1.1);
-        }
-
         button{
             width:100%;
             padding:12px;
@@ -71,12 +72,7 @@
             color:white;
             font-size:16px;
             cursor:pointer;
-            transition:0.3s;
             margin-top:10px;
-        }
-
-        button:hover{
-            background:#5a67d8;
         }
 
         .msg{
@@ -87,6 +83,8 @@
 </head>
 
 <body>
+
+<div class="back-btn" onclick="goBack()">⬅ Back</div>
 
 <div class="box">
 
@@ -106,9 +104,11 @@
 </div>
 
 <script>
-
 let fileData = null;
-let msg = document.getElementById("msg");
+
+function goBack(){
+    window.location.href = "dashboard.html";
+}
 
 function chooseFile(){
     document.getElementById("file").click();
@@ -116,7 +116,6 @@ function chooseFile(){
 
 function fileSelected(e){
     fileData = e.target.files[0];
-
     let btn = document.getElementById("uploadBtn");
     btn.innerText = "✔";
     btn.style.background = "green";
@@ -127,6 +126,7 @@ function saveNotes(){
     let cls = document.getElementById("class").value;
     let sub = document.getElementById("subject").value;
     let title = document.getElementById("title").value;
+    let msg = document.getElementById("msg");
 
     if(cls=="" || sub=="" || title=="" || !fileData){
         msg.innerText = "⚠ Enter all details";
@@ -160,7 +160,6 @@ function saveNotes(){
     btn.innerText = "+";
     btn.style.background = "#444";
 }
-
 </script>
 
 </body>
