@@ -15,6 +15,18 @@
             height:100vh;
         }
 
+        .back-btn{
+            position:absolute;
+            top:15px;
+            left:15px;
+            background:black;
+            color:white;
+            padding:8px 12px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:14px;
+        }
+
         .card{
             background:white;
             width:340px;
@@ -95,6 +107,8 @@
 
 <body>
 
+<div class="back-btn" onclick="goBack()">⬅ Back</div>
+
 <div class="card">
 
     <h2>Your Profile</h2>
@@ -125,6 +139,10 @@
 <script>
 let user = localStorage.getItem("currentUser");
 
+function goBack(){
+    window.location.href = "dashboard.html";
+}
+
 function chooseImage(){
     document.getElementById("fileInput").click();
 }
@@ -141,7 +159,6 @@ function loadImage(event){
 window.onload = function(){
     document.getElementById("scs").innerText = user;
 
-    // ✅ Username from login time
     let savedUsername = localStorage.getItem(user+"_username");
     document.getElementById("username").value = savedUsername;
 
