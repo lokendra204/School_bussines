@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:Arial;text-align:center;background:#e9e9e9;margin:0}
+.box{width:320px;margin:15px auto;background:#fff;padding:15px;border-radius:10px;text-align:left}
+a{display:inline-block;margin-top:8px;padding:6px;background:blue;color:#fff;text-decoration:none}
+</style>
+</head>
+<body>
+
+<h2>VIEW NOTES</h2>
+<div id="c"></div>
+
+<script>
+let u=localStorage.getItem("currentUser"); if(!u)location.href="index.html";
+
+for(let i=0;i<localStorage.length;i++){
+ let k=localStorage.key(i);
+ if(k.startsWith("notes_")){
+   let d=JSON.parse(localStorage.getItem(k));
+   c.innerHTML+=`
+   <div class="box">
+     <b>${d.title}</b><br>
+     Class: ${d.class}<br>
+     Subject: ${d.subject}<br>
+     <a href="${d.fileData}" download>Download</a>
+   </div>`;
+ }
+}
+</script>
+
+</body>
+</html>
