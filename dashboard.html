@@ -37,6 +37,13 @@
             align-items:center;
             font-weight:bold;
             font-size:20px;
+            overflow:hidden;
+        }
+
+        .profile-circle img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
         }
 
         .username-top{
@@ -104,7 +111,7 @@
 
 <div class="top-bar">
     <div class="profile" onclick="goProfile()">
-        <div class="profile-circle" id="initial">U</div>
+        <div class="profile-circle" id="profileCircle"></div>
         <div class="username-top" id="usernameTop"></div>
     </div>
 </div>
@@ -126,10 +133,18 @@
 <script>
 let scs = localStorage.getItem("currentUser");
 let uname = localStorage.getItem(scs + "_username") || scs;
+let pic = localStorage.getItem(scs + "_pic");
 
 document.getElementById("usernameTop").innerText = uname;
 document.getElementById("usernameBelow").innerText = uname;
-document.getElementById("initial").innerText = uname.charAt(0).toUpperCase();
+
+let circle = document.getElementById("profileCircle");
+
+if(pic){
+    circle.innerHTML = "<img src='"+pic+"'>";
+}else{
+    circle.innerText = uname.charAt(0).toUpperCase();
+}
 
 function goProfile(){
     window.location.href = "profile.html";
