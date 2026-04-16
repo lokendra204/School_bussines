@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CHAT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body{
+            margin:0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:#0f172a;
+            color:white;
+            display:flex;
+            flex-direction:column;
+            height:100vh;
+        }
+
+        .top{
+            padding:15px;
+            background:#1e293b;
+            text-align:center;
+            font-weight:bold;
+            font-size:18px;
+        }
+
+        .messages{
+            flex:1;
+            overflow-y:auto;
+            padding:15px;
+        }
+
+        .msg{
+            max-width:70%;
+            padding:10px 14px;
+            border-radius:10px;
+            margin-bottom:10px;
+            word-wrap:break-word;
+        }
+
+        .me{
+            background:#2563eb;
+            margin-left:auto;
+        }
+
+        .other{
+            background:#334155;
+            margin-right:auto;
+        }
+
+        .input-box{
+            display:flex;
+            padding:10px;
+            background:#1e293b;
+        }
+
+        input{
+            flex:1;
+            padding:10px;
+            border:none;
+            border-radius:6px;
+        }
+
+        button{
+            margin-left:10px;
+            padding:10px 16px;
+            background:#22c55e;
+            border:none;
+            border-radius:6px;
+            color:white;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        .back{
+            position:absolute;
+            left:10px;
+            top:10px;
+            cursor:pointer;
+            font-size:14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="top">
+    <div class="back" onclick="goBack()">← BACK</div>
+    <span id="chatUser"></span>
+</div>
+
+<div class="messages" id="messages"></div>
+
+<div class="input-box">
+    <input type="text" id="msgInput" placeholder="Type message...">
+    <button onclick="sendMsg()">SEND</button>
+</div>
+
+<script>
+let me = localStorage.getItem("currentUser");
+let friend = localStorage.getItem("chatWith");
+
+let friendName = localStorage.getItem(friend+"_username") || friend;
+document.getElementById("chatUser").innerText = "Chat with " + friendName;
+
+let chatKey = [me, friend].sort().join("_chat_");
+
+function loadMsgs(){
+    let msgs = JSON.parse(localStorage.getItem(chatKey)) || [];
+    let box = document.getElementById("messages");
+    box.innerHTML = "";
+
+    msgs.forEach(m => {
+        let div = document.createElement("div");
+        div.className = "msg " + (m.sender === me ? "me" : "other");
+        div.innerText = m.text;
+        box.appendChild(div);
+    });
+
+    box.scrollTop = box.scrollHeight;
+}
+
+function sendMsg(){
+    let input = document.getElementById("msgInput");
+    let text = input.value.trim();
+    if(text==="") return;
+
+    let msgs = JSON.parse(localStorage.getItem(chatKey)) || [];
+
+    msgs.push({
+        sender: me,
+        text: text
+    });
+
+    localStorage.setItem(chatKey, JSON.stringify(msgs));
+    input.value="";
+    loadMsgs();
+}
+
+function goBack(){
+    window.location.href = "friends.html";
+}
+
+loadMsgs();
+</script>
+
+</body>
+</html>
