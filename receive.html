@@ -1,130 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>View Notes</title>
+    <title>Receive Notes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
         body{
             margin:0;
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(120deg,#f6d365,#fda085);
-            padding:30px 15px;
-        }
-
-        .back-btn{
-            position:absolute;
-            top:15px;
-            left:15px;
-            background:black;
+            background:#0f172a;
             color:white;
-            padding:8px 12px;
-            border-radius:6px;
-            cursor:pointer;
-            font-size:14px;
         }
 
-        h1{
-            text-align:center;
-            color:#333;
-            margin-bottom:25px;
-            letter-spacing:2px;
+        .nav{
+            padding:15px 25px;
+        }
+
+        .nav a{
+            text-decoration:none;
+            color:white;
+            background:#1e293b;
+            padding:8px 16px;
+            border-radius:6px;
         }
 
         .container{
-            max-width:900px;
-            margin:60px auto 0;
+            max-width:500px;
+            margin:40px auto;
+            padding:10px 20px 40px 20px;
         }
 
-        .note-card{
-            background:white;
-            border-radius:14px;
-            box-shadow:0 10px 25px rgba(0,0,0,0.25);
-            padding:20px;
-            margin-bottom:20px;
-            transition:0.3s;
+        h2{
+            text-align:center;
+            margin-bottom:25px;
+            letter-spacing:1px;
         }
 
-        .note-card:hover{
-            transform:translateY(-5px);
+        .note{
+            background:#1e293b;
+            padding:18px;
+            border-radius:12px;
+            margin-bottom:18px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.5);
         }
 
         .title{
-            font-size:22px;
+            font-size:18px;
             font-weight:bold;
             margin-bottom:10px;
-            color:#222;
         }
 
-        .meta{
-            color:#555;
+        .info{
+            font-size:13px;
+            color:#cbd5e1;
             line-height:1.6;
-            margin-bottom:15px;
         }
 
-        .download-btn{
+        .btn{
             display:inline-block;
-            padding:10px 18px;
-            background:#ff7a18;
+            margin-top:12px;
+            padding:8px 14px;
+            background:#3b82f6;
             color:white;
             text-decoration:none;
-            border-radius:8px;
-            font-weight:bold;
+            border-radius:6px;
+            font-size:13px;
         }
 
         .empty{
             text-align:center;
             margin-top:40px;
-            color:#444;
-            font-size:18px;
+            color:#94a3b8;
         }
     </style>
 </head>
 
 <body>
 
-<div class="back-btn" onclick="goBack()">⬅ Back</div>
+<div class="nav">
+    <a href="dashboard.html">← Dashboard</a>
+</div>
 
-<h1>📥 VIEW NOTES</h1>
-
-<div class="container" id="container"></div>
+<div class="container">
+    <h2>Receive Notes</h2>
+    <div id="notesContainer"></div>
+</div>
 
 <script>
-function goBack(){
-    window.location.href = "dashboard.html";
-}
-
 function loadNotes(){
-    let container = document.getElementById("container");
-    container.innerHTML = "";
+    let container=document.getElementById("notesContainer");
+    container.innerHTML="";
+
+    let found=false;
 
     for(let i=0;i<localStorage.length;i++){
-        let key = localStorage.key(i);
+        let key=localStorage.key(i);
 
         if(key.startsWith("notes_")){
-            let data = JSON.parse(localStorage.getItem(key));
+            found=true;
 
-            let card = document.createElement("div");
-            card.className = "note-card";
+            let data=JSON.parse(localStorage.getItem(key));
 
-            card.innerHTML = `
+            let uname=localStorage.getItem(data.user+"_username") || data.user;
+
+            let div=document.createElement("div");
+            div.className="note";
+
+            div.innerHTML=`
                 <div class="title">${data.title}</div>
-                <div class="meta">
+                <div class="info">
                     <b>Class:</b> ${data.class}<br>
-                    <b>Subject:</b> ${data.subject}<br>
-                    <b>Uploaded by:</b> ${data.user}
+                    <b>Subject:</b> ${data.subject}<br><br>
+                    <b>Uploaded by:</b> ${uname}<br>
+                    <b>SCS:</b> ${data.user}
                 </div>
-                <a class="download-btn" href="${data.fileURL}" download="${data.fileName}">
-                    ⬇ Download Notes
-                </a>
+                <a class="btn" href="${data.fileURL}" download="${data.fileName}">Download</a>
             `;
 
-            container.appendChild(card);
+            container.appendChild(div);
         }
     }
 
-    if(container.innerHTML === ""){
-        container.innerHTML = "<div class='empty'>No notes uploaded yet.</div>";
+    if(!found){
+        container.innerHTML='<div class="empty">No notes available</div>';
     }
 }
 
