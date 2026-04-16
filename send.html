@@ -1,124 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Send Notes</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body{
-            margin:0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg,#667eea,#764ba2);
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-        }
-
-        .back-btn{
-            position:absolute;
-            top:15px;
-            left:15px;
-            background:black;
-            color:white;
-            padding:8px 12px;
-            border-radius:6px;
-            cursor:pointer;
-            font-size:14px;
-        }
-
-        .box{
-            width:350px;
-            background:white;
-            padding:25px;
-            border-radius:15px;
-            box-shadow:0 10px 30px rgba(0,0,0,0.3);
-            text-align:center;
-        }
-
-        h2{
-            margin-bottom:15px;
-        }
-
-        input{
-            width:100%;
-            padding:12px;
-            margin:10px 0;
-            border-radius:8px;
-            border:1px solid #ccc;
-        }
-
-        .upload{
-            width:90px;
-            height:90px;
-            border-radius:50%;
-            background:#444;
-            color:white;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            font-size:40px;
-            margin:15px auto;
-            cursor:pointer;
-            transition:0.3s;
-        }
-
-        button{
-            width:100%;
-            padding:12px;
-            border:none;
-            border-radius:8px;
-            background:#667eea;
-            color:white;
-            font-size:16px;
-            cursor:pointer;
-            margin-top:10px;
-        }
-
-        .msg{
-            margin-top:10px;
-            font-weight:bold;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="back-btn" onclick="goBack()">⬅ Back</div>
-
-<div class="box">
-
-    <h2>📤 Send Notes</h2>
-
-    <input type="text" id="class" placeholder="Enter Class">
-    <input type="text" id="subject" placeholder="Enter Subject">
-    <input type="text" id="title" placeholder="Enter Title">
-
-    <div class="upload" id="uploadBtn" onclick="chooseFile()">+</div>
-    <input type="file" id="file" style="display:none" onchange="fileSelected(event)">
-
-    <button onclick="saveNotes()">Send Notes</button>
-
-    <div class="msg" id="msg"></div>
-
-</div>
-
 <script>
-let fileData = null;
-
-function goBack(){
-    window.location.href = "dashboard.html";
-}
+let fileBase64 = null;
+let fileName = "";
 
 function chooseFile(){
     document.getElementById("file").click();
 }
 
 function fileSelected(e){
-    fileData = e.target.files[0];
-    let btn = document.getElementById("uploadBtn");
-    btn.innerText = "✔";
-    btn.style.background = "green";
+    let file = e.target.files[0];
+    fileName = file.name;
+
+    let reader = new FileReader();
+    reader.onload = function(event){
+        fileBase64 = event.target.result;
+
+        document.getElementById("uploadBtn").innerText = "✔";
+        document.getElementById("uploadBtn").style.background = "green";
+    }
+    reader.readAsDataURL(file);
 }
 
 function saveNotes(){
@@ -126,11 +25,10 @@ function saveNotes(){
     let cls = document.getElementById("class").value;
     let sub = document.getElementById("subject").value;
     let title = document.getElementById("title").value;
-    let msg = document.getElementById("msg");
 
-    if(cls=="" || sub=="" || title=="" || !fileData){
-        msg.innerText = "⚠ Enter all details";
-        msg.style.color = "red";
+    if(cls=="" || sub=="" || title=="" || !fileBase64){
+        document.getElementById("msg").innerText = "Enter all details";
+        document.getElementById("msg").style.color = "red";
         return;
     }
 
@@ -140,27 +38,23 @@ function saveNotes(){
         class: cls,
         subject: sub,
         title: title,
-        fileName: fileData.name,
-        fileURL: URL.createObjectURL(fileData),
+        fileName: fileName,
+        fileData: fileBase64,
         user: user
     };
 
     localStorage.setItem("notes_" + Date.now(), JSON.stringify(data));
 
-    msg.innerText = "✅ Notes successfully saved";
-    msg.style.color = "green";
+    document.getElementById("msg").innerText = "Notes successfully saved";
+    document.getElementById("msg").style.color = "green";
 
-    // Reset
     document.getElementById("class").value="";
     document.getElementById("subject").value="";
     document.getElementById("title").value="";
-    fileData=null;
 
-    let btn = document.getElementById("uploadBtn");
-    btn.innerText = "+";
-    btn.style.background = "#444";
+    fileBase64=null;
+
+    document.getElementById("uploadBtn").innerText = "+";
+    document.getElementById("uploadBtn").style.background = "#333";
 }
 </script>
-
-</body>
-</html>
