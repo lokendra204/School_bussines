@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UPLOAD BY YOU</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body{
+            margin:0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:#0f172a;
+            color:white;
+            text-align:center;
+        }
+
+        h2{
+            margin-top:25px;
+            letter-spacing:3px;
+        }
+
+        .container{
+            margin-top:30px;
+        }
+
+        .note-box{
+            width:320px;
+            margin:15px auto;
+            background:#1e293b;
+            padding:15px;
+            border-radius:10px;
+            box-shadow:0 5px 15px rgba(0,0,0,0.5);
+            text-align:left;
+        }
+
+        .title{
+            font-size:18px;
+            font-weight:bold;
+        }
+
+        .info{
+            font-size:13px;
+            margin-top:8px;
+            color:#cbd5e1;
+        }
+
+        .btn{
+            display:inline-block;
+            margin-top:10px;
+            padding:6px 10px;
+            font-size:12px;
+            border-radius:5px;
+            text-decoration:none;
+            cursor:pointer;
+            color:white;
+            border:none;
+        }
+
+        .download{ background:#16a34a; }
+        .delete{ background:#dc2626; margin-left:8px; }
+
+        .back{
+            margin:25px auto;
+            padding:10px 15px;
+            background:black;
+            color:white;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>UPLOAD BY YOU</h2>
+
+<div class="container" id="container"></div>
+
+<button class="back" onclick="window.location.href='dashboard.html'">BACK TO DASHBOARD</button>
+
+<script>
+let currentUser = localStorage.getItem("currentUser");
+let container = document.getElementById("container");
+
+function loadYourNotes(){
+
+    container.innerHTML = "";
+
+    for(let i=0;i<localStorage.length;i++){
+
+        let key = localStorage.key(i);
+
+        if(key.startsWith("notes_")){
+            let data = JSON.parse(localStorage.getItem(key));
+
+            if(data.user === currentUser){
+
+                let box = document.createElement("div");
+                box.className = "note-box";
+
+                box.innerHTML = `
+                    <div class="title">${data.title}</div>
+
+                    <div class="info">
+                        <b>Class:</b> ${data.class}<br>
+                        <b>Subject:</b> ${data.subject}<br>
+                        <b>File:</b> ${data.fileName}
+                    </div>
+
+                    <a class="btn download" href="${data.fileURL}" download="${data.fileName}">DOWNLOAD</a>
+                    <button class="btn delete" onclick="deleteNote('${key}')">DELETE</button>
+                `;
+
+                container.appendChild(box);
+            }
+        }
+    }
+
+    if(container.innerHTML === ""){
+        container.innerHTML = "<p style='color:#94a3b8'>No uploads yet.</p>";
+    }
+}
+
+function deleteNote(key){
+    if(confirm("Delete this note?")){
+        localStorage.removeItem(key);
+        loadYourNotes();
+    }
+}
+
+loadYourNotes();
+</script>
+
+</body>
+</html>
