@@ -13,139 +13,114 @@
             text-align:center;
         }
 
-        h2{
-            margin-top:25px;
-            letter-spacing:3px;
+        .top{
+            padding:15px;
+            font-size:20px;
+            font-weight:bold;
+            background:#1e293b;
+            position:relative;
+        }
+
+        .back{
+            position:absolute;
+            left:15px;
+            top:15px;
+            cursor:pointer;
+            font-size:14px;
         }
 
         .box{
-            width:320px;
-            margin:25px auto;
-            background:#1e293b;
-            padding:20px;
-            border-radius:10px;
-            box-shadow:0 5px 15px rgba(0,0,0,0.5);
+            margin-top:80px;
         }
 
         input{
-            width:100%;
-            padding:10px;
+            width:250px;
+            padding:12px;
             border:none;
-            border-radius:5px;
-            margin-top:10px;
+            border-radius:6px;
+            margin-bottom:15px;
         }
 
         button{
-            margin-top:12px;
-            padding:10px;
-            width:100%;
+            padding:10px 20px;
             border:none;
-            border-radius:5px;
+            border-radius:6px;
             background:#22c55e;
             color:white;
             font-weight:bold;
             cursor:pointer;
         }
 
-        .friend{
+        .msg{
             margin-top:15px;
-            padding:10px;
-            background:#334155;
-            border-radius:6px;
-            text-align:left;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-        }
-
-        .delete{
-            background:#dc2626;
-            border:none;
-            padding:5px 8px;
-            border-radius:4px;
-            color:white;
-            cursor:pointer;
-        }
-
-        .back{
-            margin:25px auto;
-            padding:10px 15px;
-            background:black;
-            color:white;
-            border:none;
-            border-radius:5px;
-            cursor:pointer;
+            font-size:14px;
         }
     </style>
 </head>
 
 <body>
 
-<h2>ADD FRIEND</h2>
-
-<div class="box">
-    <input type="text" id="friendScs" placeholder="ENTER FRIEND SCS NO">
-    <button onclick="addFriend()">ADD FRIEND</button>
+<div class="top">
+    <div class="back" onclick="goBack()">← BACK</div>
+    ADD FRIEND
 </div>
 
-<div id="friendsList"></div>
-
-<button class="back" onclick="window.location.href='dashboard.html'">BACK TO DASHBOARD</button>
+<div class="box">
+    <input type="text" id="friendSCS" placeholder="ENTER FRIEND SCS NO">
+    <br>
+    <button onclick="addFriend()">ADD FRIEND</button>
+    <div class="msg" id="msg"></div>
+</div>
 
 <script>
-let user = localStorage.getItem("currentUser");
-let listDiv = document.getElementById("friendsList");
-
-function getFriends(){
-    return JSON.parse(localStorage.getItem(user+"_friends") || "[]");
-}
-
-function saveFriends(arr){
-    localStorage.setItem(user+"_friends", JSON.stringify(arr));
-}
 
 function addFriend(){
-    let scs = document.getElementById("friendScs").value.trim();
-    if(scs === "") return;
 
-    let friends = getFriends();
+    let me = localStorage.getItem("currentUser");
+    let friend = document.getElementById("friendSCS").value.trim();
+    let msg = document.getElementById("msg");
 
-    if(!friends.includes(scs)){
-        friends.push(scs);
-        saveFriends(friends);
-        loadFriends();
+    if(friend === ""){
+        msg.innerText = "ENTER SCS NUMBER";
+        msg.style.color = "red";
+        return;
     }
 
-    document.getElementById("friendScs").value="";
-}
-
-function deleteFriend(scs){
-    let friends = getFriends().filter(f => f !== scs);
-    saveFriends(friends);
-    loadFriends();
-}
-
-function loadFriends(){
-    listDiv.innerHTML = "";
-
-    let friends = getFriends();
-
-    friends.forEach(scs => {
-        let div = document.createElement("div");
-        div.className = "friend";
-        div.innerHTML = `
-            <span>${scs}</span>
-            <button class="delete" onclick="deleteFriend('${scs}')">X</button>
-        `;
-        listDiv.appendChild(div);
-    });
-
-    if(friends.length === 0){
-        listDiv.innerHTML = "<p style='color:#94a3b8'>NO FRIENDS ADDED</p>";
+    if(friend === me){
+        msg.innerText = "YOU CANNOT ADD YOURSELF";
+        msg.style.color = "red";
+        return;
     }
+
+    // check if that user exists (means login once)
+    if(!localStorage.getItem(friend+"_username") && 
+       !localStorage.getItem(friend+"_display")){
+        msg.innerText = "USER DOES NOT EXIST";
+        msg.style.color = "red";
+        return;
+    }
+
+    let friends = JSON.parse(localStorage.getItem(me+"_friends")) || [];
+
+    if(friends.includes(friend)){
+        msg.innerText = "ALREADY FRIEND";
+        msg.style.color = "orange";
+        return;
+    }
+
+    friends.push(friend);
+    localStorage.setItem(me+"_friends", JSON.stringify(friends));
+
+    msg.innerText = "FRIEND ADDED SUCCESSFULLY ✅";
+    msg.style.color = "lightgreen";
+
+    document.getElementById("friendSCS").value="";
 }
 
-loadFriends();
+function goBack(){
+    window.location.href = "dashboard.html";
+}
+
 </script>
 
 </body>
