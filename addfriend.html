@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ADD FRIEND</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body{
+            margin:0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:#0f172a;
+            color:white;
+            text-align:center;
+        }
+
+        h2{
+            margin-top:25px;
+            letter-spacing:3px;
+        }
+
+        .box{
+            width:320px;
+            margin:25px auto;
+            background:#1e293b;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        input{
+            width:100%;
+            padding:10px;
+            border:none;
+            border-radius:5px;
+            margin-top:10px;
+        }
+
+        button{
+            margin-top:12px;
+            padding:10px;
+            width:100%;
+            border:none;
+            border-radius:5px;
+            background:#22c55e;
+            color:white;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        .friend{
+            margin-top:15px;
+            padding:10px;
+            background:#334155;
+            border-radius:6px;
+            text-align:left;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .delete{
+            background:#dc2626;
+            border:none;
+            padding:5px 8px;
+            border-radius:4px;
+            color:white;
+            cursor:pointer;
+        }
+
+        .back{
+            margin:25px auto;
+            padding:10px 15px;
+            background:black;
+            color:white;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>ADD FRIEND</h2>
+
+<div class="box">
+    <input type="text" id="friendScs" placeholder="ENTER FRIEND SCS NO">
+    <button onclick="addFriend()">ADD FRIEND</button>
+</div>
+
+<div id="friendsList"></div>
+
+<button class="back" onclick="window.location.href='dashboard.html'">BACK TO DASHBOARD</button>
+
+<script>
+let user = localStorage.getItem("currentUser");
+let listDiv = document.getElementById("friendsList");
+
+function getFriends(){
+    return JSON.parse(localStorage.getItem(user+"_friends") || "[]");
+}
+
+function saveFriends(arr){
+    localStorage.setItem(user+"_friends", JSON.stringify(arr));
+}
+
+function addFriend(){
+    let scs = document.getElementById("friendScs").value.trim();
+    if(scs === "") return;
+
+    let friends = getFriends();
+
+    if(!friends.includes(scs)){
+        friends.push(scs);
+        saveFriends(friends);
+        loadFriends();
+    }
+
+    document.getElementById("friendScs").value="";
+}
+
+function deleteFriend(scs){
+    let friends = getFriends().filter(f => f !== scs);
+    saveFriends(friends);
+    loadFriends();
+}
+
+function loadFriends(){
+    listDiv.innerHTML = "";
+
+    let friends = getFriends();
+
+    friends.forEach(scs => {
+        let div = document.createElement("div");
+        div.className = "friend";
+        div.innerHTML = `
+            <span>${scs}</span>
+            <button class="delete" onclick="deleteFriend('${scs}')">X</button>
+        `;
+        listDiv.appendChild(div);
+    });
+
+    if(friends.length === 0){
+        listDiv.innerHTML = "<p style='color:#94a3b8'>NO FRIENDS ADDED</p>";
+    }
+}
+
+loadFriends();
+</script>
+
+</body>
+</html>
