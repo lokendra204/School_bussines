@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FRIEND LIST</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body{
+            margin:0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:#0f172a;
+            color:white;
+        }
+
+        .top{
+            padding:15px;
+            text-align:center;
+            font-size:20px;
+            font-weight:bold;
+            background:#1e293b;
+        }
+
+        .back{
+            position:absolute;
+            left:15px;
+            top:15px;
+            cursor:pointer;
+            font-size:14px;
+        }
+
+        .container{
+            padding:20px;
+        }
+
+        .friend-box{
+            background:#1e293b;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:15px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 6px 15px rgba(0,0,0,0.4);
+        }
+
+        .friend-info{
+            display:flex;
+            flex-direction:column;
+        }
+
+        .name{
+            font-weight:bold;
+            font-size:16px;
+        }
+
+        .scs{
+            font-size:13px;
+            color:#cbd5e1;
+        }
+
+        .btns button{
+            border:none;
+            padding:8px 14px;
+            border-radius:6px;
+            color:white;
+            cursor:pointer;
+            font-weight:bold;
+            margin-left:6px;
+        }
+
+        .remove{ background:#e53935; }
+        .chat{ background:#22c55e; }
+
+        .empty{
+            text-align:center;
+            margin-top:50px;
+            color:#94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="top">
+    <div class="back" onclick="goBack()">← BACK</div>
+    YOUR FRIENDS
+</div>
+
+<div class="container" id="friendContainer"></div>
+
+<script>
+let me = localStorage.getItem("currentUser");
+let container = document.getElementById("friendContainer");
+
+function loadFriends(){
+    container.innerHTML = "";
+    let friends = JSON.parse(localStorage.getItem(me+"_friends")) || [];
+
+    if(friends.length === 0){
+        container.innerHTML = "<div class='empty'>NO FRIENDS ADDED</div>";
+        return;
+    }
+
+    friends.forEach(friend => {
+        let uname = localStorage.getItem(friend+"_username") || friend;
+
+        let box = document.createElement("div");
+        box.className = "friend-box";
+
+        box.innerHTML = `
+            <div class="friend-info">
+                <div class="name">${uname}</div>
+                <div class="scs">SCS: ${friend}</div>
+            </div>
+
+            <div class="btns">
+                <button class="remove" onclick="removeFriend('${friend}')">REMOVE</button>
+                <button class="chat" onclick="openChat('${friend}')">CHAT</button>
+            </div>
+        `;
+
+        container.appendChild(box);
+    });
+}
+
+function removeFriend(friend){
+    let friends = JSON.parse(localStorage.getItem(me+"_friends")) || [];
+    friends = friends.filter(f => f !== friend);
+    localStorage.setItem(me+"_friends", JSON.stringify(friends));
+    loadFriends();
+}
+
+function openChat(friendSCS){
+    localStorage.setItem("chatWith", friendSCS);
+    window.location.href = "chat.html";
+}
+
+function goBack(){
+    window.location.href = "dashboard.html";
+}
+
+loadFriends();
+</script>
+
+</body>
+</html>
