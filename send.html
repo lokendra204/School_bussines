@@ -3,150 +3,179 @@
 <head>
     <title>Send Notes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
         body{
-            font-family: Arial;
             margin:0;
-            background:#e9e9e9;
-            text-align:center;
-        }
-
-        h2{ margin-top:20px; }
-
-        .box{
-            width:320px;
-            margin:20px auto;
-            background:white;
-            padding:20px;
-            border-radius:10px;
-            box-shadow:0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        input{
-            width:100%;
-            padding:10px;
-            margin:10px 0;
-        }
-
-        .upload{
-            width:80px;
-            height:80px;
-            border-radius:50%;
-            background:#333;
+            font-family: Arial, Helvetica, sans-serif;
+            background:#0f172a;
             color:white;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            font-size:35px;
-            margin:15px auto;
+        }
+
+        .nav{
+            padding:15px 25px;
+        }
+
+        .nav a{
+            text-decoration:none;
+            color:white;
+            background:#1e293b;
+            padding:8px 16px;
+            border-radius:6px;
+        }
+
+        .container{
+            max-width:420px;
+            margin:40px auto;
+            background:#1e293b;
+            padding:30px;
+            border-radius:14px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:25px;
+            letter-spacing:1px;
+        }
+
+        .field{
+            margin-bottom:18px;
+        }
+
+        .field label{
+            font-size:14px;
+            display:block;
+            margin-bottom:6px;
+            color:#cbd5e1;
+        }
+
+        .field input{
+            width:100%;
+            padding:12px;
+            border-radius:8px;
+            border:none;
+            outline:none;
+            background:#334155;
+            color:white;
+        }
+
+        .upload-area{
+            margin:20px 0;
+            border:2px dashed #64748b;
+            border-radius:10px;
+            padding:25px;
+            text-align:center;
             cursor:pointer;
+            transition:0.3s;
+        }
+
+        .upload-area.done{
+            border-color:#22c55e;
+            color:#22c55e;
+        }
+
+        .upload-area span{
+            font-size:40px;
         }
 
         button{
-            padding:10px;
             width:100%;
-            background:green;
-            color:white;
+            padding:14px;
             border:none;
+            border-radius:8px;
+            background:#3b82f6;
+            color:white;
+            font-size:16px;
             cursor:pointer;
+            margin-top:10px;
         }
 
         .msg{
-            margin-top:10px;
-            font-weight:bold;
-        }
-
-        .back{
-            display:inline-block;
             margin-top:15px;
-            text-decoration:none;
-            color:blue;
+            text-align:center;
+            font-weight:bold;
         }
     </style>
 </head>
 
 <body>
 
-<h2>SEND NOTES</h2>
-
-<div class="box">
-
-    <input type="text" id="className" placeholder="Enter Class">
-    <input type="text" id="subject" placeholder="Enter Subject">
-    <input type="text" id="title" placeholder="Enter Title">
-
-    <div class="upload" id="uploadBtn" onclick="chooseFile()">+</div>
-    <input type="file" id="fileInput" style="display:none" onchange="fileSelected(event)">
-
-    <button onclick="saveNotes()">Send Notes</button>
-
-    <div class="msg" id="msg"></div>
-
+<div class="nav">
+    <a href="dashboard.html">← Dashboard</a>
 </div>
 
-<a href="dashboard.html" class="back">← Back to Dashboard</a>
+<div class="container">
+    <h2>Send Notes</h2>
+
+    <div class="field">
+        <label>Class</label>
+        <input type="text" id="class">
+    </div>
+
+    <div class="field">
+        <label>Subject</label>
+        <input type="text" id="subject">
+    </div>
+
+    <div class="field">
+        <label>Title</label>
+        <input type="text" id="title">
+    </div>
+
+    <div class="upload-area" id="uploadArea" onclick="chooseFile()">
+        <span id="uploadIcon">+</span>
+        <div>Upload File</div>
+    </div>
+
+    <input type="file" id="file" hidden onchange="fileSelected(event)">
+
+    <button onclick="saveNotes()">Send Notes</button>
+    <div class="msg" id="msg"></div>
+</div>
 
 <script>
-let fileBase64 = null;
-let fileName = "";
+let fileData=null;
 
 function chooseFile(){
-    document.getElementById("fileInput").click();
+    document.getElementById("file").click();
 }
 
 function fileSelected(e){
-    let file = e.target.files[0];
-    if(!file) return;
-
-    fileName = file.name;
-
-    let reader = new FileReader();
-    reader.onload = function(event){
-        fileBase64 = event.target.result;
-
-        document.getElementById("uploadBtn").innerText = "✔";
-        document.getElementById("uploadBtn").style.background = "green";
-    }
-    reader.readAsDataURL(file);
+    fileData=e.target.files[0];
+    let area=document.getElementById("uploadArea");
+    document.getElementById("uploadIcon").innerText="✔";
+    area.classList.add("done");
 }
 
 function saveNotes(){
+    let cls=document.getElementById("class").value;
+    let sub=document.getElementById("subject").value;
+    let title=document.getElementById("title").value;
 
-    let cls = document.getElementById("className").value;
-    let sub = document.getElementById("subject").value;
-    let title = document.getElementById("title").value;
-
-    if(cls=="" || sub=="" || title=="" || !fileBase64){
-        document.getElementById("msg").innerText = "Enter all details";
-        document.getElementById("msg").style.color = "red";
+    if(!cls || !sub || !title || !fileData){
+        showMsg("Fill all details","red");
         return;
     }
 
-    let user = localStorage.getItem("currentUser");
+    let user=localStorage.getItem("currentUser");
 
-    let data = {
-        class: cls,
-        subject: sub,
-        title: title,
-        fileName: fileName,
-        fileData: fileBase64,
-        user: user
+    let data={
+        class:cls,
+        subject:sub,
+        title:title,
+        fileName:fileData.name,
+        fileURL:URL.createObjectURL(fileData),
+        user:user
     };
 
-    localStorage.setItem("notes_" + Date.now(), JSON.stringify(data));
+    localStorage.setItem("notes_"+Date.now(),JSON.stringify(data));
+    showMsg("Notes Sent Successfully ✅","#22c55e");
+}
 
-    document.getElementById("msg").innerText = "Notes successfully saved ✅";
-    document.getElementById("msg").style.color = "green";
-
-    document.getElementById("className").value="";
-    document.getElementById("subject").value="";
-    document.getElementById("title").value="";
-
-    fileBase64=null;
-
-    document.getElementById("uploadBtn").innerText = "+";
-    document.getElementById("uploadBtn").style.background = "#333";
+function showMsg(text,color){
+    let m=document.getElementById("msg");
+    m.innerText=text;
+    m.style.color=color;
 }
 </script>
 
