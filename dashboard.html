@@ -1,134 +1,132 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome</title>
+    <title>Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
         body{
             margin:0;
             font-family: Arial, Helvetica, sans-serif;
-            background:#f5f5f5;
+            background: linear-gradient(135deg,#1e1e1e,#3a2b1f);
+            color:white;
             text-align:center;
         }
 
-        /* Profile area */
-        .profile-area{
-            position:absolute;
-            top:15px;
-            left:15px;
-            text-align:center;
+        .top-bar{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:15px 25px;
+        }
+
+        .profile{
+            display:flex;
+            align-items:center;
+            gap:10px;
             cursor:pointer;
         }
 
-        .top-circle{
-            width:65px;
-            height:65px;
+        .profile-circle{
+            width:55px;
+            height:55px;
             border-radius:50%;
-            background:#000;
-            overflow:hidden;
-            margin:auto;
-        }
-
-        .top-circle img{
-            width:100%;
-            height:100%;
-            object-fit:cover;
+            background:white;
+            color:black;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-weight:bold;
+            font-size:20px;
         }
 
         .username{
-            font-size:12px;
-            margin-top:5px;
+            font-size:18px;
             font-weight:bold;
         }
 
         h1{
-            margin-top:80px;
-            font-size:60px;
-            letter-spacing:10px;
+            margin-top:60px;
+            font-size:48px;
+            letter-spacing:6px;
         }
 
-        .container{
+        .welcome-user{
+            margin-top:10px;
+            font-size:22px;
+            opacity:0.9;
+        }
+
+        .btn-container{
+            margin-top:80px;
             display:flex;
             justify-content:center;
-            align-items:center;
-            margin-top:40px;
-            gap:60px;
+            gap:40px;
             flex-wrap:wrap;
         }
 
         .btn{
-            width:300px;
-            padding:40px 0;
-            font-size:45px;
+            width:240px;
+            padding:25px 0;
+            font-size:28px;
             font-weight:bold;
             border-radius:12px;
-            color:black;
             text-decoration:none;
-            box-shadow:0 8px 20px rgba(0,0,0,0.3);
+            color:white;
             transition:0.3s;
-            display:inline-block;
+            box-shadow:0 8px 20px rgba(0,0,0,0.5);
         }
 
-        .send{ background:red; }
-        .receive{ background:cyan; }
+        .send{
+            background:#e53935;
+        }
+
+        .receive{
+            background:#00acc1;
+        }
 
         .btn:hover{
             transform:scale(1.08);
         }
 
-        .character{
-            margin-top:30px;
-        }
-
-        .character img{
-            height:420px;
-            max-width:90%;
-        }
-
-        @media(max-width:900px){
-            h1{font-size:40px;}
-            .btn{width:220px;font-size:30px;}
-            .character img{height:260px;}
+        @media(max-width:700px){
+            h1{font-size:32px;}
+            .btn{width:180px;font-size:20px;}
         }
     </style>
 </head>
 
 <body>
 
-<!-- Profile with username -->
-<div class="profile-area" onclick="goProfile()">
-    <div class="top-circle">
-        <img id="profilePic">
+<div class="top-bar">
+    <div class="profile" onclick="goProfile()">
+        <div class="profile-circle" id="initials">U</div>
+        <div class="username" id="usernameTop"></div>
     </div>
-    <div class="username" id="uname"></div>
 </div>
 
 <h1>WELCOME</h1>
+<div class="welcome-user" id="usernameBelow"></div>
 
-<div class="container">
-    <a href="send.html" class="btn send">SEND</a>
-    <a href="receive.html" class="btn receive">RECEIVE</a>
-</div>
-
-<div class="character">
-    <img src="https://i.imgur.com/9Xn4K6G.png" alt="Toji">
+<div class="btn-container">
+    <a href="send.html" class="btn send">SEND NOTES</a>
+    <a href="receive.html" class="btn receive">RECEIVE NOTES</a>
 </div>
 
 <script>
-let user = localStorage.getItem("currentUser");
+let user = localStorage.getItem("currentUser") || "User";
 
-// Show username from login
-let name = localStorage.getItem(user+"_username") || user;
-document.getElementById("uname").innerText = name;
+// Username (login time wala)
+let uname = localStorage.getItem(user+"_username") || user;
 
-// Show profile pic if exists
-let pic = localStorage.getItem(user+"_pic");
-if(pic){
-    document.getElementById("profilePic").src = pic;
-}else{
-    document.getElementById("profilePic").src = "https://i.imgur.com/4Z7K5fM.png"; // default avatar
-}
+// Top bar
+document.getElementById("usernameTop").innerText = uname;
+
+// Below welcome
+document.getElementById("usernameBelow").innerText = uname;
+
+// Initials
+document.getElementById("initials").innerText = uname.charAt(0).toUpperCase();
 
 function goProfile(){
     window.location.href = "profile.html";
