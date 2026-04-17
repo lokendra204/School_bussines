@@ -1,132 +1,16 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Receive Notes</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body{
-            margin:0;
-            font-family: Arial, Helvetica, sans-serif;
-            background:#0f172a;
-            color:white;
-        }
+<body style="background:#0f172a;color:white;font-family:Arial">
 
-        .nav{
-            padding:15px 25px;
-        }
+<div id="list"></div>
 
-        .nav a{
-            text-decoration:none;
-            color:white;
-            background:#1e293b;
-            padding:8px 16px;
-            border-radius:6px;
-        }
-
-        .container{
-            max-width:500px;
-            margin:40px auto;
-            padding:10px 20px 40px 20px;
-        }
-
-        h2{
-            text-align:center;
-            margin-bottom:25px;
-            letter-spacing:1px;
-        }
-
-        .note{
-            background:#1e293b;
-            padding:18px;
-            border-radius:12px;
-            margin-bottom:18px;
-            box-shadow:0 8px 25px rgba(0,0,0,0.5);
-        }
-
-        .title{
-            font-size:18px;
-            font-weight:bold;
-            margin-bottom:10px;
-        }
-
-        .info{
-            font-size:13px;
-            color:#cbd5e1;
-            line-height:1.6;
-        }
-
-        .btn{
-            display:inline-block;
-            margin-top:12px;
-            padding:8px 14px;
-            background:#3b82f6;
-            color:white;
-            text-decoration:none;
-            border-radius:6px;
-            font-size:13px;
-        }
-
-        .empty{
-            text-align:center;
-            margin-top:40px;
-            color:#94a3b8;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="nav">
-    <a href="dashboard.html">← Dashboard</a>
-</div>
-
-<div class="container">
-    <h2>Receive Notes</h2>
-    <div id="notesContainer"></div>
-</div>
-
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-function loadNotes(){
-    let container=document.getElementById("notesContainer");
-    container.innerHTML="";
-
-    let found=false;
-
-    for(let i=0;i<localStorage.length;i++){
-        let key=localStorage.key(i);
-
-        if(key.startsWith("notes_")){
-            found=true;
-
-            let data=JSON.parse(localStorage.getItem(key));
-
-            let uname=localStorage.getItem(data.user+"_username") || data.user;
-
-            let div=document.createElement("div");
-            div.className="note";
-
-            div.innerHTML=`
-                <div class="title">${data.title}</div>
-                <div class="info">
-                    <b>Class:</b> ${data.class}<br>
-                    <b>Subject:</b> ${data.subject}<br><br>
-                    <b>Uploaded by:</b> ${uname}<br>
-                    <b>SCS:</b> ${data.user}
-                </div>
-                <a class="btn" href="${data.fileURL}" download="${data.fileName}">Download</a>
-            `;
-
-            container.appendChild(div);
-        }
-    }
-
-    if(!found){
-        container.innerHTML='<div class="empty">No notes available</div>';
-    }
-}
-
-loadNotes();
+firebase.initializeApp({databaseURL:"https://school-project-7beb3-default-rtdb.firebaseio.com/"});
+firebase.database().ref("notes").on("child_added",s=>{
+ list.innerHTML+= "<p>"+s.val().text+"</p>";
+});
 </script>
-
 </body>
 </html>
