@@ -1,134 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>UPLOAD BY YOU</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body{
-            margin:0;
-            font-family: Arial, Helvetica, sans-serif;
-            background:#0f172a;
-            color:white;
-            text-align:center;
-        }
-
-        h2{
-            margin-top:25px;
-            letter-spacing:3px;
-        }
-
-        .container{
-            margin-top:30px;
-        }
-
-        .note-box{
-            width:320px;
-            margin:15px auto;
-            background:#1e293b;
-            padding:15px;
-            border-radius:10px;
-            box-shadow:0 5px 15px rgba(0,0,0,0.5);
-            text-align:left;
-        }
-
-        .title{
-            font-size:18px;
-            font-weight:bold;
-        }
-
-        .info{
-            font-size:13px;
-            margin-top:8px;
-            color:#cbd5e1;
-        }
-
-        .btn{
-            display:inline-block;
-            margin-top:10px;
-            padding:6px 10px;
-            font-size:12px;
-            border-radius:5px;
-            text-decoration:none;
-            cursor:pointer;
-            color:white;
-            border:none;
-        }
-
-        .download{ background:#16a34a; }
-        .delete{ background:#dc2626; margin-left:8px; }
-
-        .back{
-            margin:25px auto;
-            padding:10px 15px;
-            background:black;
-            color:white;
-            border:none;
-            border-radius:5px;
-            cursor:pointer;
-        }
-    </style>
+<title>UPLOADED BY YOU</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+<body style="background:#0f172a;color:white;font-family:Arial;text-align:center">
 
-<body>
+<h1>YOUR UPLOADED NOTES</h1>
+<div id="list"></div>
 
-<h2>UPLOAD BY YOU</h2>
-
-<div class="container" id="container"></div>
-
-<button class="back" onclick="window.location.href='dashboard.html'">BACK TO DASHBOARD</button>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-let currentUser = localStorage.getItem("currentUser");
-let container = document.getElementById("container");
+const firebaseConfig = {
+  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
+  authDomain: "school-project-7beb3.firebaseapp.com",
+  databaseURL: "https://school-project-7beb3-default-rtdb.firebaseio.com/",
+  projectId: "school-project-7beb3"
+};
 
-function loadYourNotes(){
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+let scs = localStorage.getItem("currentUser");
 
-    container.innerHTML = "";
-
-    for(let i=0;i<localStorage.length;i++){
-
-        let key = localStorage.key(i);
-
-        if(key.startsWith("notes_")){
-            let data = JSON.parse(localStorage.getItem(key));
-
-            if(data.user === currentUser){
-
-                let box = document.createElement("div");
-                box.className = "note-box";
-
-                box.innerHTML = `
-                    <div class="title">${data.title}</div>
-
-                    <div class="info">
-                        <b>Class:</b> ${data.class}<br>
-                        <b>Subject:</b> ${data.subject}<br>
-                        <b>File:</b> ${data.fileName}
-                    </div>
-
-                    <a class="btn download" href="${data.fileURL}" download="${data.fileName}">DOWNLOAD</a>
-                    <button class="btn delete" onclick="deleteNote('${key}')">DELETE</button>
-                `;
-
-                container.appendChild(box);
-            }
+db.ref("notes").on("value",snap=>{
+    let html="";
+    snap.forEach(d=>{
+        let n=d.val();
+        if(n.owner==scs){
+            html+=`<div>
+                ${n.title}
+                <button onclick="del('${d.key}')">DELETE</button>
+            </div>`;
         }
-    }
+    });
+    document.getElementById("list").innerHTML=html;
+});
 
-    if(container.innerHTML === ""){
-        container.innerHTML = "<p style='color:#94a3b8'>No uploads yet.</p>";
-    }
+function del(k){
+    db.ref("notes/"+k).remove();
 }
-
-function deleteNote(key){
-    if(confirm("Delete this note?")){
-        localStorage.removeItem(key);
-        loadYourNotes();
-    }
-}
-
-loadYourNotes();
 </script>
 
 </body>
