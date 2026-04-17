@@ -3,98 +3,95 @@
 <head>
     <title>Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
         body{
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg,#667eea,#764ba2);
-            margin:0;
-            height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-        }
-
-        .login-box{
-            background:white;
-            padding:35px;
-            width:330px;
-            border-radius:12px;
-            box-shadow:0 10px 30px rgba(0,0,0,0.3);
-            text-align:center;
-        }
-
-        h2{
-            margin-bottom:15px;
-        }
-
-        input{
-            width:100%;
-            padding:12px;
-            margin:10px 0;
-            border:1px solid #ccc;
-            border-radius:6px;
-            font-size:14px;
-        }
-
-        button{
-            width:100%;
-            padding:12px;
-            background:#667eea;
+            background:#0f172a;
             color:white;
+            text-align:center;
+            padding-top:80px;
+        }
+        input{
+            display:block;
+            margin:15px auto;
+            padding:12px;
+            width:250px;
             border:none;
             border-radius:6px;
+        }
+        button{
+            padding:12px 25px;
+            border:none;
+            border-radius:6px;
+            background:#22c55e;
+            color:white;
+            font-weight:bold;
             cursor:pointer;
-            font-size:15px;
-            margin-top:10px;
-        }
-
-        button:hover{
-            background:#5a67d8;
-        }
-
-        .note{
-            font-size:12px;
-            margin-top:8px;
-            color:#555;
+            margin:10px;
         }
     </style>
 </head>
 
 <body>
 
-<div class="login-box">
-    <h2>Login / Sign Up</h2>
+<h1>LOGIN / SIGNUP</h1>
 
-    <input type="text" id="username" placeholder="Enter Username">
-    <input type="text" id="scs" placeholder="Enter your SCS number">
-    <input type="password" id="password" placeholder="Enter Password">
+<input type="text" id="username" placeholder="Username">
+<input type="text" id="scs" placeholder="SCS Number">
+<input type="password" id="pass" placeholder="Password">
 
-    <button onclick="login()">Continue</button>
+<button onclick="signup()">SIGN UP</button>
+<button onclick="login()">LOGIN</button>
 
-    <div class="note">
-        If SCS not registered, it will auto create account.
-    </div>
-</div>
+
+<!-- Firebase START -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
+  authDomain: "school-project-7beb3.firebaseapp.com",
+  databaseURL: "https://school-project-7beb3-default-rtdb.firebaseio.com/",
+  projectId: "school-project-7beb3",
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+function signup(){
+    let username = username.value;
+    let scs = scs.value;
+    let pass = pass.value;
+
+    db.ref("users/"+scs).set({
+        username: username,
+        password: pass
+    });
+
+    alert("Signup successful");
+}
+
 function login(){
-    let username = document.getElementById("username").value;
-    let scs = document.getElementById("scs").value;
-    let pass = document.getElementById("password").value;
+    let scsVal = scs.value;
+    let passVal = pass.value;
 
-    if(username !== "" && scs !== "" && pass !== ""){
-        // Save user data
-        localStorage.setItem("currentUser", scs);
-        localStorage.setItem(scs+"_username", username);
+    db.ref("users/"+scsVal).once("value", snap=>{
+        if(!snap.exists()){
+            alert("User not found");
+            return;
+        }
 
-        // Redirect safely
-        window.location.href = "./dashboard.html";
-    } else {
-        alert("Please fill all details");
-    }
+        let data = snap.val();
+
+        if(data.password === passVal){
+            localStorage.setItem("currentUser", scsVal);
+            window.location.href = "dashboard.html";
+        }else{
+            alert("Wrong password");
+        }
+    });
 }
 </script>
-
 </body>
 </html>
