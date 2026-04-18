@@ -1,50 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <title>LOGIN</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            background:#0f172a;
-            color:white;
-            text-align:center;
-            padding-top:80px;
-        }
-        input{
-            display:block;
-            margin:15px auto;
-            padding:12px;
-            width:250px;
-            border:none;
-            border-radius:6px;
-        }
-        button{
-            padding:12px 25px;
-            border:none;
-            border-radius:6px;
-            background:#22c55e;
-            color:white;
-            font-weight:bold;
-            cursor:pointer;
-            margin:10px;
-        }
-    </style>
 </head>
+<body style="background:#0f172a;color:white;text-align:center;font-family:Arial">
 
-<body>
+<h1>LOGIN / SIGN UP</h1>
 
-<h1>LOGIN / SIGNUP</h1>
+<input id="scs" placeholder="SCS NO"><br><br>
+<input id="username" placeholder="USERNAME"><br><br>
+<input id="pass" type="password" placeholder="PASSWORD"><br><br>
 
-<input type="text" id="username" placeholder="Username">
-<input type="text" id="scs" placeholder="SCS Number">
-<input type="password" id="pass" placeholder="Password">
-
-<button onclick="signup()">SIGN UP</button>
 <button onclick="login()">LOGIN</button>
+<button onclick="signup()">SIGN UP</button>
 
-
-<!-- Firebase START -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
@@ -53,45 +23,43 @@ const firebaseConfig = {
   apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
   authDomain: "school-project-7beb3.firebaseapp.com",
   databaseURL: "https://school-project-7beb3-default-rtdb.firebaseio.com/",
-  projectId: "school-project-7beb3",
+  projectId: "school-project-7beb3"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 function signup(){
-    let username = username.value;
-    let scs = scs.value;
-    let pass = pass.value;
+    let scs = scsInput();
+    let u = usernameInput();
+    let p = passInput();
 
     db.ref("users/"+scs).set({
-        username: username,
-        password: pass
+        username:u,
+        password:p
     });
 
-    alert("Signup successful");
+    alert("ACCOUNT CREATED");
 }
 
 function login(){
-    let scsVal = scs.value;
-    let passVal = pass.value;
+    let scs = scsInput();
+    let p = passInput();
 
-    db.ref("users/"+scsVal).once("value", snap=>{
-        if(!snap.exists()){
-            alert("User not found");
-            return;
-        }
-
-        let data = snap.val();
-
-        if(data.password === passVal){
-            localStorage.setItem("currentUser", scsVal);
-            window.location.href = "dashboard.html";
+    db.ref("users/"+scs).once("value",snap=>{
+        if(snap.exists() && snap.val().password===p){
+            localStorage.setItem("currentUser",scs);
+            window.location.href="dashboard.html";
         }else{
-            alert("Wrong password");
+            alert("WRONG DETAILS");
         }
     });
 }
+
+function scsInput(){ return document.getElementById("scs").value; }
+function usernameInput(){ return document.getElementById("username").value; }
+function passInput(){ return document.getElementById("pass").value; }
 </script>
+
 </body>
 </html>
