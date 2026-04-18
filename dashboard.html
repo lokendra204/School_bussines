@@ -3,6 +3,7 @@
 <head>
     <title>DASHBOARD</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body{
             margin:0;
@@ -12,9 +13,30 @@
             text-align:center;
         }
 
-        .top{
+        .top-right{
+            position:absolute;
+            top:15px;
+            right:20px;
             display:flex;
-            justify-content:space-between;
+            flex-direction:column;
+            gap:10px;
+        }
+
+        .top-btn{
+            padding:10px 15px;
+            background:#22c55e;
+            border-radius:6px;
+            cursor:pointer;
+            font-weight:bold;
+            text-transform:uppercase;
+        }
+
+        .friend-list-btn{
+            background:#14b8a6;
+        }
+
+        .top-bar{
+            display:flex;
             align-items:center;
             padding:15px 20px;
         }
@@ -26,92 +48,141 @@
             cursor:pointer;
         }
 
-        .profile img{
+        .profile-circle{
             width:50px;
             height:50px;
             border-radius:50%;
+            background:white;
+            color:black;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-weight:bold;
+            font-size:20px;
+            overflow:hidden;
+        }
+
+        .profile-circle img{
+            width:100%;
+            height:100%;
             object-fit:cover;
         }
 
-        .btn-grid{
-            margin-top:70px;
-            display:grid;
-            grid-template-columns: repeat(2, 220px);
-            gap:25px 40px;
-            justify-content:center;
+        .username-top{
+            font-size:16px;
+            font-weight:bold;
+        }
+
+        h1{
+            margin-top:60px;
+            font-size:42px;
+            letter-spacing:4px;
+        }
+
+        .welcome-user{
+            margin-top:8px;
+            font-size:22px;
+            color:#cbd5e1;
+        }
+
+        .btn-rows{
+            margin-top:60px;
+            display:flex;
+            flex-direction:column;
+            gap:30px;
+            align-items:center;
+        }
+
+        .row{
+            display:flex;
+            gap:40px;
         }
 
         .btn{
+            width:260px;
             padding:18px 0;
-            font-size:18px;
+            font-size:22px;
             font-weight:bold;
             border-radius:10px;
             text-decoration:none;
             color:white;
+            transition:0.3s;
+            box-shadow:0 8px 20px rgba(0,0,0,0.5);
+            text-transform:uppercase;
         }
 
         .send{ background:#e53935; }
         .receive{ background:#00acc1; }
-        .friends{ background:#8b5cf6; }
-        .vote{ background:#f59e0b; }
+        .vote{ background:#8b5cf6; }
+        .extra{ background:#f59e0b; }
+
+        .btn:hover{
+            transform:scale(1.06);
+        }
+
+        @media(max-width:650px){
+            .row{
+                flex-direction:column;
+                gap:20px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-<div class="top">
-    <div class="profile" onclick="goProfile()">
-        <img id="dp">
-        <div id="uname"></div>
-    </div>
+<div class="top-right">
+    <div class="top-btn" onclick="goAddFriend()">ADD FRIEND</div>
+    <div class="top-btn friend-list-btn" onclick="goFriendList()">FRIEND LIST</div>
+</div>
 
-    <div onclick="logout()" style="cursor:pointer;">LOGOUT</div>
+<div class="top-bar">
+    <div class="profile" onclick="goProfile()">
+        <div class="profile-circle" id="profileCircle"></div>
+        <div class="username-top" id="usernameTop"></div>
+    </div>
 </div>
 
 <h1>WELCOME</h1>
+<div class="welcome-user" id="usernameBelow"></div>
 
-<div class="btn-grid">
-    <a href="send.html" class="btn send">SEND NOTES</a>
-    <a href="receive.html" class="btn receive">RECEIVE NOTES</a>
-    <a href="friends.html" class="btn friends">FRIENDS</a>
-    <a href="vote.html" class="btn vote">VOTE</a>
+<div class="btn-rows">
+    <div class="row">
+        <a href="send.html" class="btn send">SEND NOTES</a>
+        <a href="receive.html" class="btn receive">RECEIVE NOTES</a>
+    </div>
+    <div class="row">
+        <a href="vote.html" class="btn vote">VOTE HOUSE</a>
+        <a href="youruploads.html" class="btn extra">UPLOAD BY YOU</a>
+    </div>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  databaseURL: "https://school-project-7beb3-default-rtdb.firebaseio.com/",
-  projectId: "school-project-7beb3"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
 let scs = localStorage.getItem("currentUser");
+let uname = localStorage.getItem(scs + "_username") || scs;
+let pic = localStorage.getItem(scs + "_pic");
 
-db.ref("users/"+scs).once("value", snap=>{
-    let data = snap.val();
-    document.getElementById("uname").innerText = data.username;
+document.getElementById("usernameTop").innerText = uname;
+document.getElementById("usernameBelow").innerText = uname;
 
-    if(data.pic){
-        document.getElementById("dp").src = data.pic;
-    }else{
-        document.getElementById("dp").src = "https://i.imgur.com/3ZQ3Z4F.png";
-    }
-});
+let circle = document.getElementById("profileCircle");
+
+if(pic){
+    circle.innerHTML = "<img src='"+pic+"'>";
+}else{
+    circle.innerText = uname.charAt(0).toUpperCase();
+}
 
 function goProfile(){
     window.location.href = "profile.html";
 }
 
-function logout(){
-    localStorage.removeItem("currentUser");
-    window.location.href = "index.html";
+function goAddFriend(){
+    window.location.href = "addfriend.html";
+}
+
+function goFriendList(){
+    window.location.href = "friends.html";
 }
 </script>
 
