@@ -1,65 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>LOGIN</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="background:#0f172a;color:white;text-align:center;font-family:Arial">
+<div class="login-box">
+    <h2>Login</h2>
 
-<h1>LOGIN / SIGN UP</h1>
+    <input type="text" id="scs" placeholder="Enter your SCS number">
+    <input type="text" id="username" placeholder="Enter Username">
+    <input type="password" id="password" placeholder="Enter password">
 
-<input id="scs" placeholder="SCS NO"><br><br>
-<input id="username" placeholder="USERNAME"><br><br>
-<input id="pass" type="password" placeholder="PASSWORD"><br><br>
-
-<button onclick="login()">LOGIN</button>
-<button onclick="signup()">SIGN UP</button>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <button onclick="login()">Login</button>
+</div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  databaseURL: "https://school-project-7beb3-default-rtdb.firebaseio.com/",
-  projectId: "school-project-7beb3"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-function signup(){
-    let scs = scsInput();
-    let u = usernameInput();
-    let p = passInput();
-
-    db.ref("users/"+scs).set({
-        username:u,
-        password:p
-    });
-
-    alert("ACCOUNT CREATED");
-}
-
 function login(){
-    let scs = scsInput();
-    let p = passInput();
+    let scs = document.getElementById("scs").value;
+    let uname = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
 
-    db.ref("users/"+scs).once("value",snap=>{
-        if(snap.exists() && snap.val().password===p){
-            localStorage.setItem("currentUser",scs);
-            window.location.href="dashboard.html";
-        }else{
-            alert("WRONG DETAILS");
-        }
-    });
+    if(scs && uname && pass){
+        localStorage.setItem("currentUser", scs);
+        localStorage.setItem(scs+"_username", uname);  // ✅ USERNAME SAVE
+        window.location.href = "dashboard.html";
+    } else {
+        alert("Please enter all details");
+    }
 }
-
-function scsInput(){ return document.getElementById("scs").value; }
-function usernameInput(){ return document.getElementById("username").value; }
-function passInput(){ return document.getElementById("pass").value; }
 </script>
-
-</body>
-</html>
