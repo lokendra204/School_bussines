@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>DASHBOARD</title>
+    <title>PROFILE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body{
             margin:0;
@@ -12,106 +13,172 @@
             text-align:center;
         }
 
-        .top{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            padding:15px 20px;
+        h2{
+            margin-top:25px;
+            letter-spacing:3px;
         }
 
-        .profile{
-            display:flex;
-            align-items:center;
-            gap:10px;
-            cursor:pointer;
+        .container{
+            margin-top:30px;
         }
 
-        .profile img{
-            width:50px;
-            height:50px;
+        .circle{
+            width:150px;
+            height:150px;
             border-radius:50%;
+            background:#1e293b;
+            margin:20px auto;
+            overflow:hidden;
+            cursor:pointer;
+            position:relative;
+            border:3px solid white;
+        }
+
+        .circle img{
+            width:100%;
+            height:100%;
             object-fit:cover;
         }
 
-        .btn-grid{
-            margin-top:70px;
-            display:grid;
-            grid-template-columns: repeat(2, 220px);
-            gap:25px 40px;
-            justify-content:center;
+        .plus{
+            position:absolute;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+            font-size:60px;
+            color:#94a3b8;
+        }
+
+        input[type="file"]{
+            display:none;
+        }
+
+        .info-box{
+            width:320px;
+            margin:20px auto;
+            background:#1e293b;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 5px 15px rgba(0,0,0,0.5);
+            text-align:left;
+        }
+
+        .label{
+            font-size:14px;
+            color:#cbd5e1;
+            margin-top:10px;
+        }
+
+        .edit{
+            width:100%;
+            padding:8px;
+            margin-top:5px;
+            border:none;
+            border-radius:5px;
         }
 
         .btn{
-            padding:18px 0;
-            font-size:18px;
-            font-weight:bold;
-            border-radius:10px;
-            text-decoration:none;
+            margin-top:15px;
+            padding:10px;
+            width:100%;
+            background:#16a34a;
             color:white;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+            font-weight:bold;
         }
 
-        .send{ background:#e53935; }
-        .receive{ background:#00acc1; }
-        .friends{ background:#8b5cf6; }
-        .vote{ background:#f59e0b; }
+        .msg{
+            margin-top:10px;
+            text-align:center;
+            color:#4ade80;
+            font-size:14px;
+        }
+
+        .back{
+            margin:25px auto;
+            padding:10px 15px;
+            background:black;
+            color:white;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+        }
     </style>
 </head>
 
 <body>
 
-<div class="top">
-    <div class="profile" onclick="goProfile()">
-        <img id="dp">
-        <div id="uname"></div>
+<h2>PROFILE</h2>
+
+<div class="container">
+
+    <div class="circle" onclick="chooseImage()">
+        <span class="plus" id="plus">+</span>
+        <img id="preview">
     </div>
 
-    <div onclick="logout()" style="cursor:pointer;">LOGOUT</div>
+    <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
+
+    <div class="info-box">
+
+        <div class="label">SCS NO:</div>
+        <div id="scs"></div>
+
+        <div class="label">USERNAME:</div>
+        <input class="edit" id="username">
+
+        <div class="label">DISPLAY NAME:</div>
+        <input class="edit" id="display">
+
+        <button class="btn" onclick="saveData()">SAVE CHANGES</button>
+        <div class="msg" id="msg"></div>
+
+    </div>
+
 </div>
 
-<h1>WELCOME</h1>
-
-<div class="btn-grid">
-    <a href="send.html" class="btn send">SEND NOTES</a>
-    <a href="receive.html" class="btn receive">RECEIVE NOTES</a>
-    <a href="friends.html" class="btn friends">FRIENDS</a>
-    <a href="vote.html" class="btn vote">VOTE</a>
-</div>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<button class="back" onclick="window.location.href='dashboard.html'">BACK TO DASHBOARD</button>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  databaseURL: "https://school-project-7beb3-default-rtdb.firebaseio.com/",
-  projectId: "school-project-7beb3"
-};
+let user = localStorage.getItem("currentUser");
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+document.getElementById("scs").innerText = user;
 
-let scs = localStorage.getItem("currentUser");
-
-db.ref("users/"+scs).once("value", snap=>{
-    let data = snap.val();
-    document.getElementById("uname").innerText = data.username;
-
-    if(data.pic){
-        document.getElementById("dp").src = data.pic;
-    }else{
-        document.getElementById("dp").src = "https://i.imgur.com/3ZQ3Z4F.png";
-    }
-});
-
-function goProfile(){
-    window.location.href = "profile.html";
+function chooseImage(){
+    document.getElementById("fileInput").click();
 }
 
-function logout(){
-    localStorage.removeItem("currentUser");
-    window.location.href = "index.html";
+function loadImage(event){
+    let img = document.getElementById("preview");
+    img.src = URL.createObjectURL(event.target.files[0]);
+    document.getElementById("plus").style.display="none";
+    localStorage.setItem(user+"_pic", img.src);
+}
+
+window.onload = function(){
+    let uname = localStorage.getItem(user+"_username") || user;
+    let dname = localStorage.getItem(user+"_display") || uname;
+
+    document.getElementById("username").value = uname;
+    document.getElementById("display").value = dname;
+
+    let pic = localStorage.getItem(user+"_pic");
+    if(pic){
+        document.getElementById("preview").src = pic;
+        document.getElementById("plus").style.display="none";
+    }
+}
+
+function saveData(){
+    let uname = document.getElementById("username").value;
+    let dname = document.getElementById("display").value;
+
+    localStorage.setItem(user+"_username", uname);
+    localStorage.setItem(user+"_display", dname);
+
+    document.getElementById("msg").innerText = "PROFILE SAVED SUCCESSFULLY ✅";
 }
 </script>
 
