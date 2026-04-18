@@ -77,18 +77,45 @@
     </div>
 </div>
 
-<script>
-function login(){
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
+  authDomain: "school-project-7beb3.firebaseapp.com",
+  projectId: "school-project-7beb3",
+  storageBucket: "school-project-7beb3.firebasestorage.app",
+  messagingSenderId: "846563976783",
+  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.login = async function(){
     let username = document.getElementById("username").value;
     let scs = document.getElementById("scs").value;
     let pass = document.getElementById("password").value;
 
     if(username !== "" && scs !== "" && pass !== ""){
-        // Save user data
-        localStorage.setItem("currentUser", scs);
-        localStorage.setItem(scs+"_username", username);
 
-        // Redirect safely
+        const userRef = doc(db, "users", scs);
+        const userSnap = await getDoc(userRef);
+
+        if(!userSnap.exists()){
+            // New user create
+            await setDoc(userRef, {
+                username: username,
+                password: pass,
+                scs: scs
+            });
+        }
+
+        // Save current user locally for session
+        localStorage.setItem("currentUser", scs);
+
         window.location.href = "./dashboard.html";
     } else {
         alert("Please fill all details");
