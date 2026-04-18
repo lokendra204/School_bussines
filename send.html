@@ -1,22 +1,183 @@
 <!DOCTYPE html>
 <html>
-<body style="background:#0f172a;color:white;text-align:center;font-family:Arial">
+<head>
+    <title>Send Notes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body{
+            margin:0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:#0f172a;
+            color:white;
+        }
 
-<textarea id="note"></textarea><br>
-<button onclick="send()">SEND</button>
+        .nav{
+            padding:15px 25px;
+        }
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+        .nav a{
+            text-decoration:none;
+            color:white;
+            background:#1e293b;
+            padding:8px 16px;
+            border-radius:6px;
+        }
+
+        .container{
+            max-width:420px;
+            margin:40px auto;
+            background:#1e293b;
+            padding:30px;
+            border-radius:14px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:25px;
+            letter-spacing:1px;
+        }
+
+        .field{
+            margin-bottom:18px;
+        }
+
+        .field label{
+            font-size:14px;
+            display:block;
+            margin-bottom:6px;
+            color:#cbd5e1;
+        }
+
+        .field input{
+            width:100%;
+            padding:12px;
+            border-radius:8px;
+            border:none;
+            outline:none;
+            background:#334155;
+            color:white;
+        }
+
+        .upload-area{
+            margin:20px 0;
+            border:2px dashed #64748b;
+            border-radius:10px;
+            padding:25px;
+            text-align:center;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .upload-area.done{
+            border-color:#22c55e;
+            color:#22c55e;
+        }
+
+        .upload-area span{
+            font-size:40px;
+        }
+
+        button{
+            width:100%;
+            padding:14px;
+            border:none;
+            border-radius:8px;
+            background:#3b82f6;
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+            margin-top:10px;
+        }
+
+        .msg{
+            margin-top:15px;
+            text-align:center;
+            font-weight:bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="nav">
+    <a href="dashboard.html">← Dashboard</a>
+</div>
+
+<div class="container">
+    <h2>Send Notes</h2>
+
+    <div class="field">
+        <label>Class</label>
+        <input type="text" id="class">
+    </div>
+
+    <div class="field">
+        <label>Subject</label>
+        <input type="text" id="subject">
+    </div>
+
+    <div class="field">
+        <label>Title</label>
+        <input type="text" id="title">
+    </div>
+
+    <div class="upload-area" id="uploadArea" onclick="chooseFile()">
+        <span id="uploadIcon">+</span>
+        <div>Upload File</div>
+    </div>
+
+    <input type="file" id="file" hidden onchange="fileSelected(event)">
+
+    <button onclick="saveNotes()">Send Notes</button>
+    <div class="msg" id="msg"></div>
+</div>
+
 <script>
-firebase.initializeApp({databaseURL:"https://school-project-7beb3-default-rtdb.firebaseio.com/"});
-let scs=localStorage.getItem("currentUser");
+let fileData=null;
 
-function send(){
- firebase.database().ref("notes").push({
-  by:scs,
-  text:note.value
- });
+function chooseFile(){
+    document.getElementById("file").click();
+}
+
+function fileSelected(e){
+    fileData=e.target.files[0];
+    let area=document.getElementById("uploadArea");
+    document.getElementById("uploadIcon").innerText="✔";
+    area.classList.add("done");
+}
+
+function saveNotes(){
+    let cls=document.getElementById("class").value;
+    let sub=document.getElementById("subject").value;
+    let title=document.getElementById("title").value;
+
+    if(!cls || !sub || !title || !fileData){
+        showMsg("Fill all details","red");
+        return;
+    }
+
+    let user=localStorage.getItem("currentUser");
+
+    let data={
+        class:cls,
+        subject:sub,
+        title:title,
+        fileName:fileData.name,
+        fileURL:URL.createObjectURL(fileData),
+        user:user
+    };
+
+    localStorage.setItem("notes_"+Date.now(),JSON.stringify(data));
+    showMsg("Notes Sent Successfully ✅","#22c55e");
+}
+
+function showMsg(text,color){
+    let m=document.getElementById("msg");
+    m.innerText=text;
+    m.style.color=color;
 }
 </script>
+
 </body>
 </html>
