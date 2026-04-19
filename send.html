@@ -29,21 +29,38 @@
         h2{ text-align:center; margin-bottom:25px; letter-spacing:1px; }
         .field{ margin-bottom:18px; }
         .field label{
-            font-size:14px; display:block; margin-bottom:6px; color:#cbd5e1;
+            font-size:14px;
+            display:block;
+            margin-bottom:6px;
+            color:#cbd5e1;
         }
         .field input{
-            width:100%; padding:12px; border-radius:8px; border:none;
-            outline:none; background:#334155; color:white;
+            width:100%;
+            padding:12px;
+            border-radius:8px;
+            border:none;
+            outline:none;
+            background:#334155;
+            color:white;
         }
         .upload-area{
-            margin:20px 0; border:2px dashed #64748b; border-radius:10px;
-            padding:25px; text-align:center; cursor:pointer; transition:0.3s;
+            margin:20px 0;
+            border:2px dashed #64748b;
+            border-radius:10px;
+            padding:25px;
+            text-align:center;
+            cursor:pointer;
         }
-        .upload-area.done{ border-color:#22c55e; color:#22c55e; }
-        .upload-area span{ font-size:40px; }
         button{
-            width:100%; padding:14px; border:none; border-radius:8px;
-            background:#3b82f6; color:white; font-size:16px; cursor:pointer; margin-top:10px;
+            width:100%;
+            padding:14px;
+            border:none;
+            border-radius:8px;
+            background:#3b82f6;
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+            margin-top:10px;
         }
         .msg{ margin-top:15px; text-align:center; font-weight:bold; }
     </style>
@@ -73,22 +90,19 @@
         <input type="text" id="title">
     </div>
 
-    <div class="upload-area" id="uploadArea" onclick="chooseFile()">
-        <span id="uploadIcon">+</span>
-        <div>Upload File</div>
+    <div class="upload-area" onclick="chooseFile()">
+        Upload File
     </div>
 
-    <input type="file" id="file" hidden onchange="fileSelected(event)">
+    <input type="file" id="file" hidden>
 
     <button onclick="saveNotes()">Send Notes</button>
     <div class="msg" id="msg"></div>
 </div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-storage.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
@@ -101,7 +115,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 let fileData=null;
 
@@ -109,46 +122,32 @@ window.chooseFile = function(){
     document.getElementById("file").click();
 }
 
-window.fileSelected = function(e){
+document.getElementById("file").addEventListener("change",(e)=>{
     fileData=e.target.files[0];
-    let area=document.getElementById("uploadArea");
-    document.getElementById("uploadIcon").innerText="✔";
-    area.classList.add("done");
-}
+});
 
 window.saveNotes = async function(){
     let cls=document.getElementById("class").value;
     let sub=document.getElementById("subject").value;
     let title=document.getElementById("title").value;
+    let user=localStorage.getItem("currentUser");
 
     if(!cls || !sub || !title || !fileData){
         showMsg("Fill all details","red");
         return;
     }
 
-    let user=localStorage.getItem("currentUser");
+    await addDoc(collection(db,"notes"),{
+        class:cls,
+        subject:sub,
+        title:title,
+        fileName:fileData.name,
+        fileURL:URL.createObjectURL(fileData),
+        user:user,
+        time:Date.now()
+    });
 
-    try{
-        // Upload file to Firebase Storage
-        let fileRef = ref(storage, "notes/"+Date.now()+"_"+fileData.name);
-        await uploadBytes(fileRef, fileData);
-        let fileURL = await getDownloadURL(fileRef);
-
-        // Save data to Firestore
-        await addDoc(collection(db,"notes"),{
-            class:cls,
-            subject:sub,
-            title:title,
-            fileName:fileData.name,
-            fileURL:fileURL,
-            user:user,
-            time:Date.now()
-        });
-
-        showMsg("Notes Sent Successfully ✅","#22c55e");
-    }catch(err){
-        showMsg("Error: "+err.message,"red");
-    }
+    showMsg("Notes Sent Successfully ✅","#22c55e");
 }
 
 function showMsg(text,color){
