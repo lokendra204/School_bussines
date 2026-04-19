@@ -3,97 +3,48 @@
 <head>
     <title>Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg,#667eea,#764ba2);
-            margin:0;
-            height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-        }
-
-        .login-box{
-            background:white;
-            padding:35px;
-            width:330px;
-            border-radius:12px;
-            box-shadow:0 10px 30px rgba(0,0,0,0.3);
-            text-align:center;
-        }
-
-        h2{
-            margin-bottom:15px;
-        }
-
-        input{
-            width:100%;
-            padding:12px;
-            margin:10px 0;
-            border:1px solid #ccc;
-            border-radius:6px;
-            font-size:14px;
-        }
-
-        button{
-            width:100%;
-            padding:12px;
-            background:#667eea;
-            color:white;
-            border:none;
-            border-radius:6px;
-            cursor:pointer;
-            font-size:15px;
-            margin-top:10px;
-        }
-
-        button:hover{
-            background:#5a67d8;
-        }
-
-        .note{
-            font-size:12px;
-            margin-top:8px;
-            color:#555;
-        }
-    </style>
 </head>
-
 <body>
 
-<div class="login-box">
-    <h2>Login / Sign Up</h2>
+<input id="username" placeholder="Username"><br>
+<input id="scs" placeholder="SCS"><br>
+<input id="password" type="password" placeholder="Password"><br>
+<button id="btn">Continue</button>
 
-    <input type="text" id="username" placeholder="Enter Username">
-    <input type="text" id="scs" placeholder="Enter your SCS number">
-    <input type="password" id="password" placeholder="Enter Password">
+<p id="msg" style="color:red"></p>
 
-    <button onclick="login()">Continue</button>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-    <div class="note">
-        If SCS not registered, it will auto create account.
-    </div>
-</div>
+const firebaseConfig = {
+  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
+  authDomain: "school-project-7beb3.firebaseapp.com",
+  projectId: "school-project-7beb3",
+  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
+};
 
-<script>
-function login(){
-    let username = document.getElementById("username").value;
-    let scs = document.getElementById("scs").value;
-    let pass = document.getElementById("password").value;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-    if(username !== "" && scs !== "" && pass !== ""){
-        // Save user data
-        localStorage.setItem("currentUser", scs);
-        localStorage.setItem(scs+"_username", username);
+document.getElementById("btn").onclick = async () => {
+    const scs = scs.value.trim();
+    const pass = password.value.trim();
+    const email = scs + "@scs.com";
 
-        // Redirect safely
-        window.location.href = "./dashboard.html";
-    } else {
-        alert("Please fill all details");
+    try{
+        await signInWithEmailAndPassword(auth, email, pass);
+        msg.innerText = "Login success";
+    }catch(e){
+        try{
+            await createUserWithEmailAndPassword(auth, email, pass);
+            msg.innerText = "Account created";
+        }catch(err){
+            msg.innerText = err.message;
+        }
     }
-}
+};
 </script>
 
 </body>
