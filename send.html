@@ -10,7 +10,11 @@
             background:#0f172a;
             color:white;
         }
-        .nav{ padding:15px 25px; }
+
+        .nav{
+            padding:15px 25px;
+        }
+
         .nav a{
             text-decoration:none;
             color:white;
@@ -18,6 +22,7 @@
             padding:8px 16px;
             border-radius:6px;
         }
+
         .container{
             max-width:420px;
             margin:40px auto;
@@ -26,14 +31,24 @@
             border-radius:14px;
             box-shadow:0 10px 30px rgba(0,0,0,0.5);
         }
-        h2{ text-align:center; margin-bottom:25px; letter-spacing:1px; }
-        .field{ margin-bottom:18px; }
+
+        h2{
+            text-align:center;
+            margin-bottom:25px;
+            letter-spacing:1px;
+        }
+
+        .field{
+            margin-bottom:18px;
+        }
+
         .field label{
             font-size:14px;
             display:block;
             margin-bottom:6px;
             color:#cbd5e1;
         }
+
         .field input{
             width:100%;
             padding:12px;
@@ -43,6 +58,7 @@
             background:#334155;
             color:white;
         }
+
         .upload-area{
             margin:20px 0;
             border:2px dashed #64748b;
@@ -50,7 +66,18 @@
             padding:25px;
             text-align:center;
             cursor:pointer;
+            transition:0.3s;
         }
+
+        .upload-area.done{
+            border-color:#22c55e;
+            color:#22c55e;
+        }
+
+        .upload-area span{
+            font-size:40px;
+        }
+
         button{
             width:100%;
             padding:14px;
@@ -62,7 +89,12 @@
             cursor:pointer;
             margin-top:10px;
         }
-        .msg{ margin-top:15px; text-align:center; font-weight:bold; }
+
+        .msg{
+            margin-top:15px;
+            text-align:center;
+            font-weight:bold;
+        }
     </style>
 </head>
 
@@ -90,63 +122,53 @@
         <input type="text" id="title">
     </div>
 
-    <div class="upload-area" onclick="chooseFile()">
-        Upload File
+    <div class="upload-area" id="uploadArea" onclick="chooseFile()">
+        <span id="uploadIcon">+</span>
+        <div>Upload File</div>
     </div>
 
-    <input type="file" id="file" hidden>
+    <input type="file" id="file" hidden onchange="fileSelected(event)">
 
     <button onclick="saveNotes()">Send Notes</button>
     <div class="msg" id="msg"></div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  projectId: "school-project-7beb3",
-  storageBucket: "school-project-7beb3.firebasestorage.app",
-  messagingSenderId: "846563976783",
-  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+<script>
 let fileData=null;
 
-window.chooseFile = function(){
+function chooseFile(){
     document.getElementById("file").click();
 }
 
-document.getElementById("file").addEventListener("change",(e)=>{
+function fileSelected(e){
     fileData=e.target.files[0];
-});
+    let area=document.getElementById("uploadArea");
+    document.getElementById("uploadIcon").innerText="✔";
+    area.classList.add("done");
+}
 
-window.saveNotes = async function(){
+function saveNotes(){
     let cls=document.getElementById("class").value;
     let sub=document.getElementById("subject").value;
     let title=document.getElementById("title").value;
-    let user=localStorage.getItem("currentUser");
 
     if(!cls || !sub || !title || !fileData){
         showMsg("Fill all details","red");
         return;
     }
 
-    await addDoc(collection(db,"notes"),{
+    let user=localStorage.getItem("currentUser");
+
+    let data={
         class:cls,
         subject:sub,
         title:title,
         fileName:fileData.name,
         fileURL:URL.createObjectURL(fileData),
-        user:user,
-        time:Date.now()
-    });
+        user:user
+    };
 
+    localStorage.setItem("notes_"+Date.now(),JSON.stringify(data));
     showMsg("Notes Sent Successfully ✅","#22c55e");
 }
 
