@@ -24,7 +24,9 @@
             text-align:center;
         }
 
-        h2{ margin-bottom:15px; }
+        h2{
+            margin-bottom:15px;
+        }
 
         input{
             width:100%;
@@ -75,45 +77,22 @@
     </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword }
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+<script>
+function login(){
+    let username = document.getElementById("username").value;
+    let scs = document.getElementById("scs").value;
+    let pass = document.getElementById("password").value;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  projectId: "school-project-7beb3",
-  storageBucket: "school-project-7beb3.firebasestorage.app",
-  messagingSenderId: "846563976783",
-  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
-};
+    if(username !== "" && scs !== "" && pass !== ""){
+        // Save user data
+        localStorage.setItem("currentUser", scs);
+        localStorage.setItem(scs+"_username", username);
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-window.login = async function(){
-    let username = document.getElementById("username").value.trim();
-    let scs = document.getElementById("scs").value.trim();
-    let pass = document.getElementById("password").value.trim();
-
-    if(username==="" || scs==="" || pass===""){
+        // Redirect safely
+        window.location.href = "./dashboard.html";
+    } else {
         alert("Please fill all details");
-        return;
     }
-
-    let email = scs + "@scs.com";
-
-    try{
-        await createUserWithEmailAndPassword(auth, email, pass);
-    }catch(e){
-        await signInWithEmailAndPassword(auth, email, pass);
-    }
-
-    localStorage.setItem("currentUser", scs);
-    localStorage.setItem(scs+"_username", username);
-
-    window.location.href = "dashboard.html";
 }
 </script>
 
