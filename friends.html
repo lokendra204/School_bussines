@@ -11,14 +11,15 @@
             background:#0f172a;
             color:white;
         }
+
         .top{
             padding:15px;
             text-align:center;
             font-size:20px;
             font-weight:bold;
             background:#1e293b;
-            position:relative;
         }
+
         .back{
             position:absolute;
             left:15px;
@@ -26,7 +27,11 @@
             cursor:pointer;
             font-size:14px;
         }
-        .container{ padding:20px; }
+
+        .container{
+            padding:20px;
+        }
+
         .friend-box{
             background:#1e293b;
             padding:15px;
@@ -37,9 +42,22 @@
             align-items:center;
             box-shadow:0 6px 15px rgba(0,0,0,0.4);
         }
-        .friend-info{ display:flex; flex-direction:column; }
-        .name{ font-weight:bold; font-size:16px; }
-        .scs{ font-size:13px; color:#cbd5e1; }
+
+        .friend-info{
+            display:flex;
+            flex-direction:column;
+        }
+
+        .name{
+            font-weight:bold;
+            font-size:16px;
+        }
+
+        .scs{
+            font-size:13px;
+            color:#cbd5e1;
+        }
+
         .btns button{
             border:none;
             padding:8px 14px;
@@ -49,8 +67,10 @@
             font-weight:bold;
             margin-left:6px;
         }
+
         .remove{ background:#e53935; }
         .chat{ background:#22c55e; }
+
         .empty{
             text-align:center;
             margin-top:50px;
@@ -68,46 +88,21 @@
 
 <div class="container" id="friendContainer"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import {
-  getFirestore, collection, getDocs, query, where,
-  doc, getDoc, deleteDoc
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  projectId: "school-project-7beb3",
-  storageBucket: "school-project-7beb3.firebasestorage.app",
-  messagingSenderId: "846563976783",
-  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+<script>
 let me = localStorage.getItem("currentUser");
 let container = document.getElementById("friendContainer");
 
-async function loadFriends(){
+function loadFriends(){
     container.innerHTML = "";
+    let friends = JSON.parse(localStorage.getItem(me+"_friends")) || [];
 
-    // ✅ Get all friends where me = current user
-    const q = query(collection(db,"friends"), where("me","==",me));
-    const snap = await getDocs(q);
-
-    if(snap.empty){
+    if(friends.length === 0){
         container.innerHTML = "<div class='empty'>NO FRIENDS ADDED</div>";
         return;
     }
 
-    for(const d of snap.docs){
-        let friend = d.data().friend;
-
-        // ✅ Get friend username from users collection
-        const userSnap = await getDoc(doc(db,"users",friend));
-        let uname = userSnap.exists() ? userSnap.data().username : friend;
+    friends.forEach(friend => {
+        let uname = localStorage.getItem(friend+"_username") || friend;
 
         let box = document.createElement("div");
         box.className = "friend-box";
@@ -117,6 +112,7 @@ async function loadFriends(){
                 <div class="name">${uname}</div>
                 <div class="scs">SCS: ${friend}</div>
             </div>
+
             <div class="btns">
                 <button class="remove" onclick="removeFriend('${friend}')">REMOVE</button>
                 <button class="chat" onclick="openChat('${friend}')">CHAT</button>
@@ -124,20 +120,23 @@ async function loadFriends(){
         `;
 
         container.appendChild(box);
-    }
+    });
 }
 
-window.removeFriend = async function(friend){
-    await deleteDoc(doc(db,"friends", me+"_"+friend));
+function removeFriend(friend){
+    let friends = JSON.parse(localStorage.getItem(me+"_friends")) || [];
+    friends = friends.filter(f => f !== friend);
+    localStorage.setItem(me+"_friends", JSON.stringify(friends));
     loadFriends();
 }
 
-window.openChat = function(friendSCS){
+function openChat(friendSCS){
+    // ✅ KEY FIX HERE
     localStorage.setItem("chatFriend", friendSCS);
     window.location.href = "chat.html";
 }
 
-window.goBack = function(){
+function goBack(){
     window.location.href = "dashboard.html";
 }
 
