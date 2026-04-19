@@ -141,67 +141,42 @@
 
 <button class="back" onclick="window.location.href='dashboard.html'">BACK TO DASHBOARD</button>
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  projectId: "school-project-7beb3",
-  storageBucket: "school-project-7beb3.firebasestorage.app",
-  messagingSenderId: "846563976783",
-  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+<script>
 let user = localStorage.getItem("currentUser");
+
 document.getElementById("scs").innerText = user;
-
-async function loadProfile(){
-    const snap = await getDoc(doc(db,"users",user));
-    if(snap.exists()){
-        let data = snap.data();
-        document.getElementById("username").value = data.username || "";
-        document.getElementById("display").value = data.display || "";
-
-        if(data.pic){
-            document.getElementById("preview").src = data.pic;
-            document.getElementById("plus").style.display="none";
-        }
-    }
-}
-
-window.onload = loadProfile;
 
 function chooseImage(){
     document.getElementById("fileInput").click();
 }
 
-let imageBase64 = "";
-
 function loadImage(event){
-    let reader = new FileReader();
-    reader.onload = function(){
-        imageBase64 = reader.result;
-        document.getElementById("preview").src = imageBase64;
-        document.getElementById("plus").style.display="none";
-    }
-    reader.readAsDataURL(event.target.files[0]);
+    let img = document.getElementById("preview");
+    img.src = URL.createObjectURL(event.target.files[0]);
+    document.getElementById("plus").style.display="none";
+    localStorage.setItem(user+"_pic", img.src);
 }
 
-window.saveData = async function(){
+window.onload = function(){
+    let uname = localStorage.getItem(user+"_username") || user;
+    let dname = localStorage.getItem(user+"_display") || uname;
+
+    document.getElementById("username").value = uname;
+    document.getElementById("display").value = dname;
+
+    let pic = localStorage.getItem(user+"_pic");
+    if(pic){
+        document.getElementById("preview").src = pic;
+        document.getElementById("plus").style.display="none";
+    }
+}
+
+function saveData(){
     let uname = document.getElementById("username").value;
     let dname = document.getElementById("display").value;
 
-    await setDoc(doc(db,"users",user),{
-        username: uname,
-        display: dname,
-        pic: imageBase64 || null
-    },{merge:true});
+    localStorage.setItem(user+"_username", uname);
+    localStorage.setItem(user+"_display", dname);
 
     document.getElementById("msg").innerText = "PROFILE SAVED SUCCESSFULLY ✅";
 }
