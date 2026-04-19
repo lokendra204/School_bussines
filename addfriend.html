@@ -72,23 +72,9 @@
     <div class="msg" id="msg"></div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+<script>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  projectId: "school-project-7beb3",
-  storageBucket: "school-project-7beb3.firebasestorage.app",
-  messagingSenderId: "846563976783",
-  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.addFriend = async function(){
+function addFriend(){
 
     let me = localStorage.getItem("currentUser");
     let friend = document.getElementById("friendSCS").value.trim();
@@ -106,30 +92,35 @@ window.addFriend = async function(){
         return;
     }
 
-    // ✅ Check user exists in Firestore
-    const userRef = doc(db,"users",friend);
-    const userSnap = await getDoc(userRef);
-
-    if(!userSnap.exists()){
+    // check if that user exists (means login once)
+    if(!localStorage.getItem(friend+"_username") && 
+       !localStorage.getItem(friend+"_display")){
         msg.innerText = "USER DOES NOT EXIST";
         msg.style.color = "red";
         return;
     }
 
-    // ✅ Save friend in Firestore (friends collection)
-    await setDoc(doc(db,"friends", me+"_"+friend), {
-        me: me,
-        friend: friend
-    });
+    let friends = JSON.parse(localStorage.getItem(me+"_friends")) || [];
+
+    if(friends.includes(friend)){
+        msg.innerText = "ALREADY FRIEND";
+        msg.style.color = "orange";
+        return;
+    }
+
+    friends.push(friend);
+    localStorage.setItem(me+"_friends", JSON.stringify(friends));
 
     msg.innerText = "FRIEND ADDED SUCCESSFULLY ✅";
     msg.style.color = "lightgreen";
+
     document.getElementById("friendSCS").value="";
 }
 
-window.goBack = function(){
+function goBack(){
     window.location.href = "dashboard.html";
 }
+
 </script>
 
 </body>
