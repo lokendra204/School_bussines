@@ -3,6 +3,7 @@
 <head>
     <title>Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body{
             font-family: Arial, Helvetica, sans-serif;
@@ -13,6 +14,7 @@
             justify-content:center;
             align-items:center;
         }
+
         .login-box{
             background:white;
             padding:35px;
@@ -21,13 +23,20 @@
             box-shadow:0 10px 30px rgba(0,0,0,0.3);
             text-align:center;
         }
+
+        h2{
+            margin-bottom:15px;
+        }
+
         input{
             width:100%;
             padding:12px;
             margin:10px 0;
             border:1px solid #ccc;
             border-radius:6px;
+            font-size:14px;
         }
+
         button{
             width:100%;
             padding:12px;
@@ -36,60 +45,55 @@
             border:none;
             border-radius:6px;
             cursor:pointer;
+            font-size:15px;
+            margin-top:10px;
+        }
+
+        button:hover{
+            background:#5a67d8;
+        }
+
+        .note{
+            font-size:12px;
+            margin-top:8px;
+            color:#555;
         }
     </style>
 </head>
+
 <body>
 
 <div class="login-box">
     <h2>Login / Sign Up</h2>
+
     <input type="text" id="username" placeholder="Enter Username">
     <input type="text" id="scs" placeholder="Enter your SCS number">
     <input type="password" id="password" placeholder="Enter Password">
-    <button id="loginBtn">Continue</button>
+
+    <button onclick="login()">Continue</button>
+
+    <div class="note">
+        If SCS not registered, it will auto create account.
+    </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+<script>
+function login(){
+    let username = document.getElementById("username").value;
+    let scs = document.getElementById("scs").value;
+    let pass = document.getElementById("password").value;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  projectId: "school-project-7beb3",
-  storageBucket: "school-project-7beb3.firebasestorage.app",
-  messagingSenderId: "846563976783",
-  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
-};
+    if(username !== "" && scs !== "" && pass !== ""){
+        // Save user data
+        localStorage.setItem("currentUser", scs);
+        localStorage.setItem(scs+"_username", username);
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-document.getElementById("loginBtn").addEventListener("click", async () => {
-    let username = document.getElementById("username").value.trim();
-    let scs = document.getElementById("scs").value.trim();
-    let pass = document.getElementById("password").value.trim();
-
-    if(!username || !scs || !pass){
-        alert("Fill all details");
-        return;
-    }
-
-    const ref = doc(db, "users", scs);
-    const snap = await getDoc(ref);
-
-    if(!snap.exists()){
-        await setDoc(ref, { username, password: pass });
+        // Redirect safely
+        window.location.href = "./dashboard.html";
     } else {
-        if(snap.data().password !== pass){
-            alert("Wrong password");
-            return;
-        }
+        alert("Please fill all details");
     }
-
-    localStorage.setItem("currentUser", scs);
-    window.location.href = "dashboard.html";
-});
+}
 </script>
 
 </body>
