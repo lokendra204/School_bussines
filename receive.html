@@ -10,7 +10,11 @@
             background:#0f172a;
             color:white;
         }
-        .nav{ padding:15px 25px; }
+
+        .nav{
+            padding:15px 25px;
+        }
+
         .nav a{
             text-decoration:none;
             color:white;
@@ -18,12 +22,19 @@
             padding:8px 16px;
             border-radius:6px;
         }
+
         .container{
             max-width:500px;
             margin:40px auto;
             padding:10px 20px 40px 20px;
         }
-        h2{ text-align:center; margin-bottom:25px; letter-spacing:1px; }
+
+        h2{
+            text-align:center;
+            margin-bottom:25px;
+            letter-spacing:1px;
+        }
+
         .note{
             background:#1e293b;
             padding:18px;
@@ -31,8 +42,19 @@
             margin-bottom:18px;
             box-shadow:0 8px 25px rgba(0,0,0,0.5);
         }
-        .title{ font-size:18px; font-weight:bold; margin-bottom:10px; }
-        .info{ font-size:13px; color:#cbd5e1; line-height:1.6; }
+
+        .title{
+            font-size:18px;
+            font-weight:bold;
+            margin-bottom:10px;
+        }
+
+        .info{
+            font-size:13px;
+            color:#cbd5e1;
+            line-height:1.6;
+        }
+
         .btn{
             display:inline-block;
             margin-top:12px;
@@ -43,6 +65,7 @@
             border-radius:6px;
             font-size:13px;
         }
+
         .empty{
             text-align:center;
             margin-top:40px;
@@ -62,53 +85,44 @@
     <div id="notesContainer"></div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  projectId: "school-project-7beb3",
-  storageBucket: "school-project-7beb3.firebasestorage.app",
-  messagingSenderId: "846563976783",
-  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-async function loadNotes(){
+<script>
+function loadNotes(){
     let container=document.getElementById("notesContainer");
     container.innerHTML="";
 
-    const q = query(collection(db,"notes"), orderBy("time","desc"));
-    const snapshot = await getDocs(q);
+    let found=false;
 
-    if(snapshot.empty){
-        container.innerHTML='<div class="empty">No notes available</div>';
-        return;
+    for(let i=0;i<localStorage.length;i++){
+        let key=localStorage.key(i);
+
+        if(key.startsWith("notes_")){
+            found=true;
+
+            let data=JSON.parse(localStorage.getItem(key));
+
+            let uname=localStorage.getItem(data.user+"_username") || data.user;
+
+            let div=document.createElement("div");
+            div.className="note";
+
+            div.innerHTML=`
+                <div class="title">${data.title}</div>
+                <div class="info">
+                    <b>Class:</b> ${data.class}<br>
+                    <b>Subject:</b> ${data.subject}<br><br>
+                    <b>Uploaded by:</b> ${uname}<br>
+                    <b>SCS:</b> ${data.user}
+                </div>
+                <a class="btn" href="${data.fileURL}" download="${data.fileName}">Download</a>
+            `;
+
+            container.appendChild(div);
+        }
     }
 
-    snapshot.forEach(doc=>{
-        let data = doc.data();
-
-        let div=document.createElement("div");
-        div.className="note";
-
-        div.innerHTML=`
-            <div class="title">${data.title}</div>
-            <div class="info">
-                <b>Class:</b> ${data.class}<br>
-                <b>Subject:</b> ${data.subject}<br><br>
-                <b>Uploaded by:</b> ${data.user}<br>
-                <b>SCS:</b> ${data.user}
-            </div>
-            <a class="btn" href="${data.fileURL}" download="${data.fileName}">Download</a>
-        `;
-
-        container.appendChild(div);
-    });
+    if(!found){
+        container.innerHTML='<div class="empty">No notes available</div>';
+    }
 }
 
 loadNotes();
