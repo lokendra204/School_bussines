@@ -131,7 +131,8 @@ function removeFriend(friend){
 }
 
 function openChat(friendSCS){
-    localStorage.setItem("chatWith", friendSCS);
+    // ✅ KEY FIX HERE
+    localStorage.setItem("chatFriend", friendSCS);
     window.location.href = "chat.html";
 }
 
