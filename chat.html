@@ -91,7 +91,7 @@ button{
 
 <script>
 let me = localStorage.getItem("currentUser");
-let friend = localStorage.getItem("chatFriend"); // ✅ FIXED KEY
+let friend = localStorage.getItem("chatFriend");
 
 let uname = localStorage.getItem(friend+"_username") || friend;
 let pic = localStorage.getItem(friend+"_pic");
@@ -136,6 +136,13 @@ function sendMsg(){
 document.getElementById("msgInput").addEventListener("keypress", function(e){
     if(e.key==="Enter"){
         sendMsg();
+    }
+});
+
+// ⭐ MAGIC FIX — AUTO UPDATE WHEN OTHER USER SENDS MESSAGE
+window.addEventListener("storage", function(e){
+    if(e.key === chatKey){
+        loadChat();
     }
 });
 
