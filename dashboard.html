@@ -1,92 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>DASHBOARD</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-    <style>
-        body{
-            margin:0;
-            font-family: Arial, Helvetica, sans-serif;
-            background:#0f172a;
-            color:white;
-            text-align:center;
-        }
+const firebaseConfig = {
+  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
+  authDomain: "school-project-7beb3.firebaseapp.com",
+  projectId: "school-project-7beb3",
+  storageBucket: "school-project-7beb3.firebasestorage.app",
+  messagingSenderId: "846563976783",
+  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
+};
 
-        .top-right{
-            position:absolute;
-            top:15px;
-            right:20px;
-            display:flex;
-            flex-direction:column;
-            gap:10px;
-        }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-        .top-btn{
-            padding:10px 15px;
-            background:#22c55e;
-            border-radius:6px;
-            cursor:pointer;
-            font-weight:bold;
-            text-transform:uppercase;
-        }
+// 🔥 current user SCS saved at login time
+let scs = localStorage.getItem("currentUser");
 
-        .friend-list-btn{
-            background:#14b8a6;
-        }
+if(!scs){
+    window.location.href = "index.html";
+}
 
-        .top-bar{
-            display:flex;
-            align-items:center;
-            padding:15px 20px;
-        }
+async function loadUser(){
+    const snap = await getDoc(doc(db,"users",scs));
 
-        .profile{
-            display:flex;
-            align-items:center;
-            gap:10px;
-            cursor:pointer;
-        }
+    if(!snap.exists()) return;
 
-        .profile-circle{
-            width:50px;
-            height:50px;
-            border-radius:50%;
-            background:white;
-            color:black;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            font-weight:bold;
-            font-size:20px;
-            overflow:hidden;
-        }
+    let data = snap.data();
 
-        .profile-circle img{
-            width:100%;
-            height:100%;
-            object-fit:cover;
-        }
+    document.getElementById("usernameTop").innerText = data.username;
+    document.getElementById("usernameBelow").innerText = data.username;
 
-        .username-top{
-            font-size:16px;
-            font-weight:bold;
-        }
+    let circle = document.getElementById("profileCircle");
 
-        h1{
-            margin-top:60px;
-            font-size:42px;
-            letter-spacing:4px;
-        }
+    if(data.pic){
+        circle.innerHTML = "<img src='"+data.pic+"'>";
+    }else{
+        circle.innerText = data.username.charAt(0).toUpperCase();
+    }
+}
 
-        .welcome-user{
-            margin-top:8px;
-            font-size:22px;
-            color:#cbd5e1;
-        }
+loadUser();
 
-        .btn-rows{
-            margin-top:60px;
-            display:flex;
-            flex-direction:column;
-            gap
+window.goProfile = function(){
+    window.location.href = "profile.html";
+}
+window.goAddFriend = function(){
+    window.location.href = "addfriend.html";
+}
+window.goFriendList = function(){
+    window.location.href = "friends.html";
+}
+</script>
