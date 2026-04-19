@@ -157,48 +157,33 @@
     </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA_0wFUxxNk3Dc8s3jYuUq85kEwYqoFLGw",
-  authDomain: "school-project-7beb3.firebaseapp.com",
-  projectId: "school-project-7beb3",
-  storageBucket: "school-project-7beb3.firebasestorage.app",
-  messagingSenderId: "846563976783",
-  appId: "1:846563976783:web:7dfdb561fa79b17cefec3a"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+<script>
 let scs = localStorage.getItem("currentUser");
+let uname = localStorage.getItem(scs + "_username") || scs;
+let pic = localStorage.getItem(scs + "_pic");
 
-async function loadUser(){
-    const snap = await getDoc(doc(db, "users", scs));
-    if(snap.exists()){
-        let data = snap.data();
-        let uname = data.username;
-        let pic = data.pic;
+document.getElementById("usernameTop").innerText = uname;
+document.getElementById("usernameBelow").innerText = uname;
 
-        document.getElementById("usernameTop").innerText = uname;
-        document.getElementById("usernameBelow").innerText = uname;
+let circle = document.getElementById("profileCircle");
 
-        let circle = document.getElementById("profileCircle");
-        if(pic){
-            circle.innerHTML = "<img src='"+pic+"'>";
-        }else{
-            circle.innerText = uname.charAt(0).toUpperCase();
-        }
-    }
+if(pic){
+    circle.innerHTML = "<img src='"+pic+"'>";
+}else{
+    circle.innerText = uname.charAt(0).toUpperCase();
 }
 
-loadUser();
+function goProfile(){
+    window.location.href = "profile.html";
+}
 
-function goProfile(){ window.location.href="profile.html"; }
-function goAddFriend(){ window.location.href="addfriend.html"; }
-function goFriendList(){ window.location.href="friends.html"; }
+function goAddFriend(){
+    window.location.href = "addfriend.html";
+}
+
+function goFriendList(){
+    window.location.href = "friends.html";
+}
 </script>
 
 </body>
